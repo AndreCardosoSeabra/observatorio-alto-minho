@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Observatório territorial da CIM Alto Minho com indicadores municipais do INE e da Pordata.">
+  <title>Observatório Alto Minho</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="rail">
+    <a class="brand" href="#top" aria-label="Observatório Alto Minho — início">
+      <span class="brand-symbol" aria-hidden="true"><i></i><i></i></span>
+      <span><b>Alto Minho</b><small>Observatório territorial</small></span>
+    </a>
+    <nav aria-label="Navegação principal">
+      <a class="active" href="#retrato"><span>01</span>Retrato</a>
+      <a href="#comparar"><span>02</span>Comparar</a>
+      <a href="#indicadores"><span>03</span>Indicadores</a>
+      <a href="#metodologia"><span>04</span>Metodologia</a>
+    </nav>
+    <div class="rail-note">
+      <span class="source-dot"></span>
+      <p>Dados estatísticos<br><strong>INE · Pordata</strong></p>
+    </div>
+    <button class="source-link" type="button" data-open-source>Consultar catálogo <span>↓</span></button>
+  </header>
+
+  <main id="top">
+    <section class="workspace" id="retrato">
+      <div class="page-intro">
+        <div>
+          <p class="overline">CIM Alto Minho · retrato territorial</p>
+          <h1>Conhecer o território.<br><em>Decidir com contexto.</em></h1>
+        </div>
+        <div class="territory-picker">
+          <label for="territory-select">Território em análise</label>
+          <select id="territory-select" aria-label="Escolha o território"></select>
+          <p>10 municípios · NUTS III Alto Minho</p>
+        </div>
+      </div>
+
+      <div class="territory-title-row">
+        <div><span>Território selecionado</span><h2 id="territory-title">Alto Minho</h2></div>
+        <p><i></i> Matriz de indicadores do projeto · fontes INE e Pordata</p>
+      </div>
+
+      <div class="territory-stage">
+        <section class="map-panel" aria-label="Mapa dos municípios do Alto Minho">
+          <div class="map-caption">
+            <span>Mapa municipal</span>
+            <p>Selecione um município para explorar os seus indicadores.</p>
+          </div>
+          <svg class="region-map" viewBox="0 0 520 390" role="img" aria-labelledby="map-title map-description">
+            <title id="map-title">Mapa interativo dos dez municípios do Alto Minho</title>
+            <desc id="map-description">Limites administrativos dos municípios da Comunidade Intermunicipal do Alto Minho.</desc>
+            <g id="map-nodes"></g>
+          </svg>
+          <div class="map-key"><span></span> Município ativo <small>Limites: CAOP · DGT</small></div>
+        </section>
+
+        <section class="metric-panel" aria-label="Indicadores de síntese">
+          <div class="metric-heading">
+            <p>Indicadores de síntese</p>
+            <span>Último ano disponível</span>
+          </div>
+          <div class="kpis" id="kpi-grid" aria-live="polite"></div>
+        </section>
+      </div>
+
+      <section class="themes" aria-labelledby="themes-title">
+        <div class="section-index">01</div>
+        <div class="section-copy">
+          <p class="overline">Áreas de observação</p>
+          <h2 id="themes-title">Escolha uma perspetiva</h2>
+        </div>
+        <div class="theme-tabs" role="tablist" aria-label="Áreas temáticas">
+          <button class="theme active" role="tab" aria-selected="true" data-theme="Demografia">Demografia</button>
+          <button class="theme" role="tab" aria-selected="false" data-theme="Habitação">Habitação</button>
+          <button class="theme" role="tab" aria-selected="false" data-theme="Emprego">Emprego</button>
+          <button class="theme" role="tab" aria-selected="false" data-theme="Educação">Educação</button>
+          <button class="theme" role="tab" aria-selected="false" data-theme="Saúde">Saúde</button>
+          <button class="theme" role="tab" aria-selected="false" data-theme="Coesão social">Coesão social</button>
+        </div>
+      </section>
+
+      <section class="theme-overview" id="panorama-tematico">
+        <div class="overview-copy">
+          <p class="overline" id="theme-kicker">Área de Demografia</p>
+          <h2 id="theme-title">Estrutura e dinâmica da população</h2>
+          <p id="theme-description">Leia a evolução demográfica e compare o território com o Alto Minho.</p>
+        </div>
+        <div class="indicator-cards" id="indicator-cards"></div>
+      </section>
+
+      <section class="compare-section" id="comparar">
+        <div class="section-index">02</div>
+        <div class="compare-head">
+          <div>
+            <p class="overline">Benchmarking municipal</p>
+            <h2>Dez municípios,<br>uma escala comum</h2>
+          </div>
+          <label class="compare-control">Indicador a comparar
+            <select id="compare-indicator" aria-label="Indicador a comparar"></select>
+          </label>
+        </div>
+        <div class="chart" id="comparison-chart" aria-label="Comparação dos municípios"></div>
+      </section>
+
+      <section class="catalog-section" id="indicadores">
+        <div class="catalog-head">
+          <div class="section-index">03</div>
+          <div>
+            <p class="overline">Catálogo · 50 indicadores</p>
+            <h2>Encontrar um indicador</h2>
+          </div>
+          <label class="search-control">
+            <span class="sr-only">Pesquisar indicadores</span>
+            <input id="indicator-search" type="search" placeholder="Pesquisar por nome ou área…">
+          </label>
+        </div>
+        <div class="indicator-detail" id="indicator-detail" aria-live="polite">
+          <div class="detail-copy">
+            <p class="overline">Indicador selecionado</p>
+            <h3 id="detail-name"></h3>
+            <p id="detail-description"></p>
+          </div>
+          <div class="detail-value">
+            <span id="detail-territory"></span>
+            <strong id="detail-value"></strong>
+          </div>
+          <dl class="detail-meta">
+            <div><dt>Área</dt><dd id="detail-area"></dd></div>
+            <div><dt>Ano</dt><dd id="detail-year"></dd></div>
+            <div><dt>Leitura</dt><dd id="detail-dimension"></dd></div>
+            <div><dt>Fonte</dt><dd><a id="detail-source-link" href="#" target="_blank" rel="noopener"><span id="detail-source"></span> ↗</a></dd></div>
+          </dl>
+          <button class="detail-action" id="indicator-compare-button" type="button">Comparar municípios <span>↓</span></button>
+        </div>
+        <div class="catalog-table-wrap">
+          <table>
+            <thead><tr><th>Indicador</th><th>Área</th><th>Ano</th><th>Fonte</th></tr></thead>
+            <tbody id="catalog-body"></tbody>
+          </table>
+          <p class="empty-state" id="catalog-empty" hidden>Nenhum indicador corresponde à pesquisa.</p>
+        </div>
+      </section>
+
+      <section class="method-section" id="metodologia">
+        <div class="method-intro">
+          <div class="section-index">04</div>
+          <p class="overline">Metodologia</p>
+          <h2>Dados comparáveis,<br>decisões mais claras.</h2>
+          <p>O observatório organiza a informação estatística do Alto Minho com regras comuns de fonte, período e território.</p>
+        </div>
+        <div class="method-list">
+          <article><b>Fontes documentadas</b><p>Cada indicador identifica a sua origem no INE, nos Censos ou na Pordata.</p></article>
+          <article><b>Atualização rastreável</b><p>O sistema regista a série e o ano mais recente que foram validados.</p></article>
+          <article><b>Escala territorial</b><p>São apresentados os dez municípios e o Alto Minho enquanto NUTS III.</p></article>
+          <article><b>Comparação homogénea</b><p>A definição, unidade e período mantêm-se iguais entre territórios.</p></article>
+        </div>
+        <p class="prototype-note">Protótipo funcional com valores para os 50 indicadores da matriz do projeto, extraídos das bases de trabalho do INE e da Pordata. Cada leitura identifica o ano e a dimensão apresentados.</p>
+      </section>
+    </section>
+  </main>
+  <script src="./catalog-data.js"></script>
+  <script src="./indicator-values.js"></script>
+  <script src="./map-data.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
