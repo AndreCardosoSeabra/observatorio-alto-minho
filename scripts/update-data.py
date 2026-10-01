@@ -4,7 +4,10 @@ import itertools
 import json
 import math
 import re
+import shutil
 import statistics
+import subprocess
+import sys
 import time
 import unicodedata
 import urllib.request
@@ -94,6 +97,43 @@ def validate_values(values: dict[str, float | int], indicator: str) -> None:
 
 
 def fetch_json(url: str, attempts: int = 3) -> object:
+    curl = shutil.which("curl")
+    if curl:
+        last_error = None
+        for attempt in range(attempts):
+            try:
+                result = subprocess.run(
+                    [
+                        curl,
+                        "--fail",
+                        "--silent",
+                        "--show-error",
+                        "--location",
+                        "--ipv4",
+                        "--http1.1",
+                        "--compressed",
+                        "--connect-timeout",
+                        "20",
+                        "--max-time",
+                        "90",
+                        "--header",
+                        "Accept: application/json, text/javascript, */*; q=0.01",
+                        "--header",
+                        "Referer: https://www.ine.pt/",
+                        "--user-agent",
+                        "Mozilla/5.0 (compatible; Observatorio-Alto-Minho/1.0)",
+                        url,
+                    ],
+                    check=True,
+                    capture_output=True,
+                    timeout=100,
+                )
+                return json.loads(result.stdout.decode("utf-8-sig"))
+            except Exception as error:
+                last_error = error
+                time.sleep(2**attempt)
+        raise RuntimeError(f"Falha ao consultar {url} por IPv4: {last_error}")
+
     request = urllib.request.Request(url, headers={"User-Agent": "Observatorio-Alto-Minho/1.0"})
     last_error = None
     for attempt in range(attempts):
@@ -322,6 +362,14 @@ def update_catalog_links() -> None:
 
 def main() -> None:
     values_by_name = read_javascript_object(VALUES_PATH, "indicatorValuesByName")
+    if "--check-ine" in sys.argv:
+        report: list[dict] = []
+        ine_count = update_ine(values_by_name, report)
+        if ine_count != 6:
+            raise RuntimeError(f"Só {ine_count} indicadores INE passaram a validação")
+        print("Ligação ao INE validada: 6 indicadores disponíveis.")
+        return
+
     expected_pordata = len(json.loads(PORDATA_SOURCES_PATH.read_text(encoding="utf-8")))
     report: list[dict] = []
     pordata_count = update_pordata(values_by_name, report)
