@@ -14,6 +14,8 @@ O workflow `Atualizar dados estatísticos` corre todas as segundas-feiras e tamb
 
 Se uma fonte falhar ou devolver uma estrutura inesperada, o workflow termina sem substituir os dados publicados.
 
+O INE bloqueia ligações diretas provenientes dos servidores partilhados do GitHub. Nessas execuções, a consulta passa por um gateway de leitura do INE e só é aceite quando a resposta identifica o endereço oficial consultado e o código exato do indicador. Fora do GitHub, o script consulta diretamente a API do INE.
+
 Os endereços permanentes usados para cada indicador Pordata estão em `data/pordata-sources.json`. Os indicadores do INE e as respetivas dimensões estão definidos em `scripts/update-data.py`.
 
 ## Alterações ao site

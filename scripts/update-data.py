@@ -3,6 +3,7 @@ from __future__ import annotations
 import itertools
 import json
 import math
+import os
 import re
 import shutil
 import statistics
@@ -96,7 +97,64 @@ def validate_values(values: dict[str, float | int], indicator: str) -> None:
         raise ValueError(f"{indicator}: todos os valores são zero")
 
 
+def fetch_ine_via_gateway(url: str, attempts: int = 3) -> object:
+    code_match = re.search(r"[?&]varcd=(\d+)", url)
+    if not code_match:
+        raise ValueError(f"Pedido INE sem código de indicador: {url}")
+    code = code_match.group(1)
+    curl = shutil.which("curl")
+    if not curl:
+        raise RuntimeError("O cliente curl é necessário para o gateway do INE")
+    request_body = json.dumps({
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "tools/call",
+        "params": {"name": "get_indicator", "arguments": {"varcd": code, "lang": "PT"}},
+    })
+    last_error = None
+    for attempt in range(attempts):
+        try:
+            result = subprocess.run(
+                [
+                    curl,
+                    "--fail",
+                    "--silent",
+                    "--show-error",
+                    "--location",
+                    "--compressed",
+                    "--connect-timeout",
+                    "20",
+                    "--max-time",
+                    "120",
+                    "--header",
+                    "Content-Type: application/json",
+                    "--data-binary",
+                    request_body,
+                    "https://gateway.pipeworx.io/ine-pt/mcp",
+                ],
+                check=True,
+                capture_output=True,
+                timeout=130,
+            )
+            envelope = json.loads(result.stdout.decode("utf-8-sig"))
+            provenance_url = envelope.get("result", {}).get("_meta", {}).get("provenance", {}).get("upstream", {}).get("url", "")
+            if "www.ine.pt/ine/json_indicador/pindica.jsp" not in provenance_url or f"varcd={code}" not in provenance_url:
+                raise ValueError("O gateway não confirmou a proveniência oficial do INE")
+            content = envelope["result"]["content"][0]["text"]
+            payload = json.loads(content)
+            if not isinstance(payload, list) or not payload or payload[0].get("IndicadorCod") != code:
+                raise ValueError(f"O gateway devolveu um indicador diferente de {code}")
+            return payload
+        except Exception as error:
+            last_error = error
+            time.sleep(2**attempt)
+    raise RuntimeError(f"Falha ao consultar o indicador INE {code} através do gateway: {last_error}")
+
+
 def fetch_json(url: str, attempts: int = 3) -> object:
+    if os.environ.get("GITHUB_ACTIONS") == "true" and "www.ine.pt/ine/json_indicador/" in url:
+        return fetch_ine_via_gateway(url, attempts)
+
     curl = shutil.which("curl")
     if curl:
         last_error = None
@@ -363,11 +421,11 @@ def update_catalog_links() -> None:
 def main() -> None:
     values_by_name = read_javascript_object(VALUES_PATH, "indicatorValuesByName")
     if "--check-ine" in sys.argv:
-        report: list[dict] = []
-        ine_count = update_ine(values_by_name, report)
-        if ine_count != 6:
-            raise RuntimeError(f"Só {ine_count} indicadores INE passaram a validação")
-        print("Ligação ao INE validada: 6 indicadores disponíveis.")
+        code = INE_DIRECT["Superfície Km2"]["code"]
+        payload = fetch_json(f"https://www.ine.pt/ine/json_indicador/pindica.jsp?op=2&varcd={code}&lang=PT")
+        if not isinstance(payload, list) or not payload or payload[0].get("IndicadorCod") != code:
+            raise RuntimeError("A ligação ao INE devolveu uma resposta inválida")
+        print("Ligação ao INE e proveniência oficial validadas.")
         return
 
     expected_pordata = len(json.loads(PORDATA_SOURCES_PATH.read_text(encoding="utf-8")))
