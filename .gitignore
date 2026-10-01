@@ -1,0 +1,10 @@
+.cache/
+node_modules/
+__pycache__/
+data/update-report.json
+ine-*.json
+pordata-*.html
+pordata-*.xml
+pordata-*.xlsx
+pordata-*.bin
+pordata-page-matches.txt

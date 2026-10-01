@@ -1,0 +1,56 @@
+name: Atualizar dados estatísticos
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * 1"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-statistical-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Obter o site
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependências
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          python -m pip install -r requirements.txt
+
+      - name: Descarregar dados da Pordata
+        run: npm run download:pordata
+
+      - name: Atualizar e validar os indicadores
+        run: python scripts/update-data.py
+
+      - name: Publicar alterações
+        run: |
+          if git diff --quiet -- indicator-values.js catalog-data.js; then
+            echo "Não existem dados novos."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add indicator-values.js catalog-data.js
+          git commit -m "Atualizar indicadores do INE e da Pordata"
+          git push
