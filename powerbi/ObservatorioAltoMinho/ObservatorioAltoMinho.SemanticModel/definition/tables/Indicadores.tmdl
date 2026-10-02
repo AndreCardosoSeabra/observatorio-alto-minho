@@ -34,6 +34,40 @@ table Indicadores
 		formatString: #,##0.##
 		displayFolder: Comparação
 
+	/// Valor do indicador escolhido para o Alto Minho no respetivo ano mais recente.
+	measure 'Valor do catálogo' = ```
+		VAR _Indicador = [Indicador em análise]
+		VAR _Ano = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = _Indicador, 'Indicadores'[Território] = "Alto Minho")
+		RETURN CALCULATE(MAX('Indicadores'[Valor]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = _Indicador, 'Indicadores'[Território] = "Alto Minho", 'Indicadores'[Ano] = _Ano)
+		```
+		formatString: #,##0.##
+		displayFolder: Catálogo
+
+	measure 'Ano do catálogo' = ```
+		VAR _Indicador = [Indicador em análise]
+		RETURN CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = _Indicador, 'Indicadores'[Território] = "Alto Minho")
+		```
+		formatString: 0
+		displayFolder: Catálogo
+
+	measure 'Área do catálogo' = ```
+		VAR _Indicador = [Indicador em análise]
+		RETURN CALCULATE(SELECTEDVALUE('Indicadores'[Domínio]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = _Indicador)
+		```
+		displayFolder: Catálogo
+
+	measure 'Fonte do catálogo' = ```
+		VAR _Indicador = [Indicador em análise]
+		RETURN CALCULATE(SELECTEDVALUE('Indicadores'[Fonte]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = _Indicador)
+		```
+		displayFolder: Catálogo
+
+	measure 'Leitura do catálogo' = ```
+		VAR _Indicador = [Indicador em análise]
+		RETURN CALCULATE(SELECTEDVALUE('Indicadores'[Dimensão]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = _Indicador)
+		```
+		displayFolder: Catálogo
+
 	/// Último ano com dados no contexto selecionado.
 	measure 'Último ano' = MAX('Indicadores'[Ano])
 		formatString: 0

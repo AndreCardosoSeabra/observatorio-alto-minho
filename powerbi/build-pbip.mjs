@@ -89,8 +89,11 @@ function shape(x, y, width, height, color, z = 0, radius = 0) {
   return { name, json };
 }
 
-function card(measureName, x, y, width, height) {
+function card(measureName, x, y, width, height, options = {}) {
   const name = hex();
+  const background = options.background ?? C.white;
+  const valueColor = options.valueColor ?? C.ink;
+  const labelColor = options.labelColor ?? C.muted;
   return {
     name,
     json: {
@@ -101,15 +104,36 @@ function card(measureName, x, y, width, height) {
         visualType: "cardVisual",
         query: { queryState: { Data: { projections: [projection(measure(measureName), `Indicadores.${measureName}`, measureName)] } } },
         objects: {
-          value: [{ properties: { fontSize: lit("24D") }, selector: { id: "default" } }],
-          label: [{ properties: { fontSize: lit("10D") }, selector: { id: "default" } }],
-          padding: [{ properties: { paddingUniform: lit("8D") }, selector: { id: "default" } }],
-          layout: [{ properties: { paddingUniform: lit("0D") }, selector: { id: "default" } }]
+          value: [{ properties: { fontSize: lit(`${options.valueSize ?? 24}D`), fontFamily: lit(`'${options.valueFamily ?? "Segoe UI"}'`), fontColor: { solid: { color: lit(`'${valueColor}'`) } }, bold: lit(options.valueBold ? "true" : "false"), labelDisplayUnits: lit("1D") }, selector: { id: "default" } }],
+          label: [{ properties: { fontSize: lit(`${options.labelSize ?? 10}D`), fontColor: { solid: { color: lit(`'${labelColor}'`) } }, ...(options.labelText ? { text: lit(`'${options.labelText}'`) } : {}) }, selector: { id: "default" } }],
+          padding: [{ properties: { paddingUniform: lit(`${options.padding ?? 8}D`) }, selector: { id: "default" } }],
+          layout: [{ properties: { paddingUniform: lit("0D"), backgroundShow: lit("false") }, selector: { id: "default" } }]
         },
         visualContainerObjects: {
-          background: [{ properties: { show: lit("true"), color: { solid: { color: lit(`'${C.white}'`) } }, transparency: lit("0D") } }],
-          border: [{ properties: { show: lit("true"), color: { solid: { color: lit("'#D6DFDB'") } }, radius: lit("10D"), width: lit("1D") } }],
+          background: [{ properties: { show: lit(options.transparent ? "false" : "true"), color: { solid: { color: lit(`'${background}'`) } }, transparency: lit("0D") } }],
+          border: [{ properties: { show: lit(options.border === false ? "false" : "true"), color: { solid: { color: lit("'#D6DFDB'") } }, radius: lit("10D"), width: lit("1D") } }],
           padding: [{ properties: { top: lit("8D"), bottom: lit("8D"), left: lit("10D"), right: lit("10D") } }]
+        }
+      }
+    }
+  };
+}
+
+function imageVisual(resourceName, x, y, width, height) {
+  const name = hex();
+  return {
+    name,
+    json: {
+      $schema: visualSchema,
+      name,
+      position: position(x, y, width, height, 4000, 4000),
+      visual: {
+        visualType: "image",
+        objects: { general: [{ properties: { imageUrl: { expr: { ResourcePackageItem: { PackageName: "RegisteredResources", PackageType: 1, ItemName: resourceName } } } } }] },
+        visualContainerObjects: {
+          background: [{ properties: { show: lit("false") } }],
+          border: [{ properties: { show: lit("false") } }],
+          padding: [{ properties: { top: lit("0D"), bottom: lit("0D"), left: lit("0D"), right: lit("0D") } }]
         }
       }
     }
@@ -233,7 +257,7 @@ function azureMap(categoryProperty, measureName, x, y, width, height) {
   };
 }
 
-function table(fields, x, y, width, height) {
+function table(fields, x, y, width, height, options = {}) {
   const name = hex();
   const projections = fields.map(f => projection(f.type === "measure" ? measure(f.name) : column(f.name), `Indicadores.${f.name}`, f.name));
   return {
@@ -246,12 +270,12 @@ function table(fields, x, y, width, height) {
         visualType: "tableEx",
         query: { queryState: { Values: { projections } } },
         objects: {
-          columnHeaders: [{ properties: { columnAdjustment: lit("'growToFit'"), autoSizeColumnWidth: lit("true"), backColor: { solid: { color: lit(`'${C.green}'`) } }, fontColor: { solid: { color: lit(`'${C.white}'`) } } } }],
-          values: [{ properties: { backColorPrimary: { solid: { color: lit(`'${C.white}'`) } }, backColorSecondary: { solid: { color: lit("'#EEF3F0'") } }, fontColorPrimary: { solid: { color: lit(`'${C.ink}'`) } }, fontColorSecondary: { solid: { color: lit(`'${C.ink}'`) } } } }]
+          columnHeaders: [{ properties: { columnAdjustment: lit("'growToFit'"), autoSizeColumnWidth: lit("true"), backColor: { solid: { color: lit(`'${options.headerBackground ?? C.green}'`) } }, fontColor: { solid: { color: lit(`'${options.headerColor ?? C.white}'`) } } } }],
+          values: [{ properties: { backColorPrimary: { solid: { color: lit(`'${options.rowPrimary ?? C.white}'`) } }, backColorSecondary: { solid: { color: lit(`'${options.rowSecondary ?? "#EEF3F0"}'`) } }, fontColorPrimary: { solid: { color: lit(`'${C.ink}'`) } }, fontColorSecondary: { solid: { color: lit(`'${C.ink}'`) } } } }]
         },
         visualContainerObjects: {
-          background: [{ properties: { show: lit("true"), color: { solid: { color: lit(`'${C.white}'`) } }, transparency: lit("0D") } }],
-          border: [{ properties: { show: lit("true"), color: { solid: { color: lit("'#D6DFDB'") } }, radius: lit("10D"), width: lit("1D") } }]
+          background: [{ properties: { show: lit(options.transparent ? "false" : "true"), color: { solid: { color: lit(`'${C.white}'`) } }, transparency: lit("0D") } }],
+          border: [{ properties: { show: lit(options.border === false ? "false" : "true"), color: { solid: { color: lit("'#D6DFDB'") } }, radius: lit("10D"), width: lit("1D") } }]
         }
       }
     }
@@ -292,6 +316,15 @@ function chrome(section, title, subtitle) {
 
 fs.mkdirSync(tablesDir, { recursive: true });
 fs.mkdirSync(registered, { recursive: true });
+
+const mapResourceName = "alto-minho-municipios.svg";
+const mapSource = fs.readFileSync(path.resolve("map-data.js"), "utf8");
+const mapShapes = JSON.parse(mapSource.slice(mapSource.indexOf("[")).replace(/;\s*$/, ""));
+const mapSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 390" role="img" aria-label="Mapa dos municípios do Alto Minho">
+  <rect width="520" height="390" fill="#DDECEF"/>
+  <g>${mapShapes.map(item => `<path d="${item.path}" fill="#245B4C" stroke="#DDECEF" stroke-width="2"/><text x="${item.label[0]}" y="${item.label[1]}" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="9" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#153B32" stroke-width="2">${item.name.replaceAll("&", "&amp;")}</text>`).join("")}</g>
+</svg>`;
+fs.writeFileSync(path.join(registered, mapResourceName), mapSvg, "utf8");
 
 writeJson(path.join(modelDir, "definition.pbism"), {
   $schema: "https://developer.microsoft.com/json-schemas/fabric/item/semanticModel/definitionProperties/1.0.0/schema.json",
@@ -336,6 +369,40 @@ const tableTmdl = `table Indicadores
 \t\t\`\`\`
 \t\tformatString: #,##0.##
 \t\tdisplayFolder: Comparação
+
+\t/// Valor do indicador escolhido para o Alto Minho no respetivo ano mais recente.
+\tmeasure 'Valor do catálogo' = \`\`\`
+\t\tVAR _Indicador = [Indicador em análise]
+\t\tVAR _Ano = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = _Indicador, 'Indicadores'[Território] = "Alto Minho")
+\t\tRETURN CALCULATE(MAX('Indicadores'[Valor]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = _Indicador, 'Indicadores'[Território] = "Alto Minho", 'Indicadores'[Ano] = _Ano)
+\t\t\`\`\`
+\t\tformatString: #,##0.##
+\t\tdisplayFolder: Catálogo
+
+\tmeasure 'Ano do catálogo' = \`\`\`
+\t\tVAR _Indicador = [Indicador em análise]
+\t\tRETURN CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = _Indicador, 'Indicadores'[Território] = "Alto Minho")
+\t\t\`\`\`
+\t\tformatString: 0
+\t\tdisplayFolder: Catálogo
+
+\tmeasure 'Área do catálogo' = \`\`\`
+\t\tVAR _Indicador = [Indicador em análise]
+\t\tRETURN CALCULATE(SELECTEDVALUE('Indicadores'[Domínio]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = _Indicador)
+\t\t\`\`\`
+\t\tdisplayFolder: Catálogo
+
+\tmeasure 'Fonte do catálogo' = \`\`\`
+\t\tVAR _Indicador = [Indicador em análise]
+\t\tRETURN CALCULATE(SELECTEDVALUE('Indicadores'[Fonte]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = _Indicador)
+\t\t\`\`\`
+\t\tdisplayFolder: Catálogo
+
+\tmeasure 'Leitura do catálogo' = \`\`\`
+\t\tVAR _Indicador = [Indicador em análise]
+\t\tRETURN CALCULATE(SELECTEDVALUE('Indicadores'[Dimensão]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = _Indicador)
+\t\t\`\`\`
+\t\tdisplayFolder: Catálogo
 
 \t/// Último ano com dados no contexto selecionado.
 \tmeasure 'Último ano' = MAX('Indicadores'[Ano])
@@ -543,7 +610,10 @@ writeJson(path.join(registered, themeName), theme);
 const report = JSON.parse(fs.readFileSync(path.join(reportDef, "report.json"), "utf8"));
 report.themeCollection.customTheme = { name: themeName, reportVersionAtImport: { visual: "2.11.0", report: "3.4.0", page: "2.3.1" }, type: "RegisteredResources" };
 report.resourcePackages = report.resourcePackages.filter(p => p.name !== "RegisteredResources");
-report.resourcePackages.push({ name: "RegisteredResources", type: "RegisteredResources", items: [{ name: themeName, path: themeName, type: "CustomTheme" }] });
+report.resourcePackages.push({ name: "RegisteredResources", type: "RegisteredResources", items: [
+  { name: themeName, path: themeName, type: "CustomTheme" },
+  { name: mapResourceName, path: mapResourceName, type: "Image" }
+] });
 writeJson(path.join(reportDef, "report.json"), report);
 
 const p1 = "76f7c1e691fd43c485ec";
@@ -568,14 +638,17 @@ buildPage(p1, "01 Retrato territorial", [
   shape(72, 382, 655, 290, C.pale, 100),
   textbox("Mapa municipal", 100, 408, 220, 36, 23, C.ink, "normal", "Georgia"),
   textbox("Selecione um município para explorar os seus indicadores.", 465, 409, 220, 48, 12, "#557178"),
-  azureMap("Localização", "População municipal", 98, 462, 600, 180),
+  imageVisual(mapResourceName, 100, 458, 598, 190),
+  textbox("●  Município ativo     Limites: CAOP · DGT", 100, 646, 430, 20, 11, "#557178"),
   shape(727, 382, 791, 290, C.green, 100),
   textbox("Indicadores de síntese", 765, 410, 350, 40, 25, C.white, "normal", "Georgia"),
   textbox("Último ano disponível", 1305, 416, 175, 24, 12, "#9DB8AE"),
-  card("População residente", 765, 468, 330, 82),
-  card("Índice de envelhecimento", 1112, 468, 368, 82),
-  card("Preço médio por m²", 765, 566, 330, 82),
-  card("Saldo migratório", 1112, 566, 368, 82)
+  shape(765, 458, 715, 1, "#4E7067", 110),
+  card("População residente", 765, 470, 330, 76, { transparent: true, border: false, valueColor: C.white, labelColor: "#C0D0CA", valueSize: 30, valueFamily: "Georgia", padding: 0 }),
+  card("Índice de envelhecimento", 1112, 470, 368, 76, { transparent: true, border: false, valueColor: C.white, labelColor: "#C0D0CA", valueSize: 30, valueFamily: "Georgia", padding: 0 }),
+  shape(765, 554, 715, 1, "#4E7067", 110),
+  card("Preço médio por m²", 765, 568, 330, 76, { transparent: true, border: false, valueColor: C.white, labelColor: "#C0D0CA", valueSize: 30, valueFamily: "Georgia", padding: 0 }),
+  card("Saldo migratório", 1112, 568, 368, 76, { transparent: true, border: false, valueColor: C.white, labelColor: "#C0D0CA", valueSize: 30, valueFamily: "Georgia", padding: 0 })
 ]);
 
 buildPage(p2, "02 Comparação municipal", [
@@ -592,13 +665,18 @@ buildPage(p3, "03 Catálogo de indicadores", [
   textbox("CATÁLOGO · 50 INDICADORES", 160, 68, 380, 24, 13, C.green, "bold"),
   textbox("Encontrar um indicador", 160, 105, 720, 66, 42, C.ink, "normal", "Georgia"),
   slicer("Indicador", "Pesquisar por nome ou área", 1110, 84, 408, { transparent: true, border: false }),
-  shape(72, 198, 1446, 1, C.ink, 100),
-  slicer("Domínio", "Área", 72, 220, 270, { transparent: true, border: false }),
-  slicer("Tema", "Tema", 362, 220, 270, { transparent: true, border: false }),
-  slicer("Fonte", "Fonte", 652, 220, 250, { transparent: true, border: false }),
-  card("Indicadores disponíveis", 930, 220, 270, 82),
-  card("Último ano", 1218, 220, 300, 82),
-  table([{name:"Indicador"},{name:"Domínio"},{name:"Ano"},{name:"Fonte"}], 72, 332, 1446, 336)
+  shape(72, 198, 1446, 242, C.pale, 100),
+  shape(72, 198, 6, 242, C.blue, 101),
+  card("Indicador em análise", 104, 220, 790, 92, { transparent: true, border: false, valueColor: C.ink, labelColor: C.green, valueSize: 25, valueFamily: "Georgia", labelSize: 11, labelText: "INDICADOR SELECIONADO", padding: 0 }),
+  textbox("Número ou valor oficial para o território e período selecionados.", 114, 320, 730, 34, 13, "#557178"),
+  card("Valor do catálogo", 1100, 224, 374, 106, { transparent: true, border: false, valueColor: C.green, labelColor: "#557178", valueSize: 38, valueFamily: "Georgia", labelSize: 11, labelText: "Alto Minho", padding: 0 }),
+  card("Área do catálogo", 104, 366, 270, 58, { transparent: true, border: false, valueColor: C.green, labelColor: "#557178", valueSize: 14, labelSize: 9, labelText: "ÁREA", padding: 0 }),
+  card("Ano do catálogo", 390, 366, 210, 58, { transparent: true, border: false, valueColor: C.green, labelColor: "#557178", valueSize: 14, labelSize: 9, labelText: "ANO", padding: 0 }),
+  card("Leitura do catálogo", 616, 366, 270, 58, { transparent: true, border: false, valueColor: C.green, labelColor: "#557178", valueSize: 14, labelSize: 9, labelText: "LEITURA", padding: 0 }),
+  card("Fonte do catálogo", 902, 366, 270, 58, { transparent: true, border: false, valueColor: C.green, labelColor: "#557178", valueSize: 14, labelSize: 9, labelText: "FONTE", padding: 0 }),
+  textbox("Comparar municípios  ↓", 1272, 382, 205, 26, 13, C.green, "bold"),
+  shape(72, 474, 1446, 2, C.ink, 100),
+  table([{name:"Indicador"},{name:"Domínio"},{name:"Ano"},{name:"Fonte"}], 72, 486, 1446, 190, { transparent: true, border: false, headerBackground: C.cream, headerColor: C.muted, rowPrimary: C.cream, rowSecondary: "#F8F8F3" })
 ]);
 
 buildPage(p4, "04 Metodologia", [

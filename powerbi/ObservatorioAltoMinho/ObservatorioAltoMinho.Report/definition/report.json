@@ -40,6 +40,11 @@
           "name": "AltoMinho-4f9c2a10.json",
           "path": "AltoMinho-4f9c2a10.json",
           "type": "CustomTheme"
+        },
+        {
+          "name": "alto-minho-municipios.svg",
+          "path": "alto-minho-municipios.svg",
+          "type": "Image"
         }
       ]
     }
