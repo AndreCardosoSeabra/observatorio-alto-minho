@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import itertools
 import json
 import math
@@ -23,6 +24,7 @@ CATALOG_PATH = ROOT / "catalog-data.js"
 PORDATA_SOURCES_PATH = ROOT / "data" / "pordata-sources.json"
 PORDATA_DIRECTORY = ROOT / ".cache" / "pordata"
 REPORT_PATH = ROOT / "data" / "update-report.json"
+POWERBI_PATH = ROOT / "powerbi-data.csv"
 
 TERRITORIES = [
     "Alto Minho",
@@ -418,6 +420,44 @@ def update_catalog_links() -> None:
     write_javascript_object(CATALOG_PATH, "Catálogo da matriz intermunicipal e ligações permanentes das fontes.", "indicatorCatalog", catalog)
 
 
+def write_powerbi_dataset(values_by_name: dict) -> None:
+    catalog = read_javascript_object(CATALOG_PATH, "indicatorCatalog")
+    fields = [
+        "Indicador",
+        "Territorio",
+        "TipoTerritorio",
+        "Ano",
+        "Valor",
+        "Unidade",
+        "Dimensao",
+        "Dominio",
+        "Tema",
+        "Categoria",
+        "Fonte",
+        "FonteURL",
+    ]
+    with POWERBI_PATH.open("w", encoding="utf-8-sig", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer.writeheader()
+        for item in catalog:
+            dataset = values_by_name[item["name"]]
+            for territory in TERRITORIES:
+                writer.writerow({
+                    "Indicador": item["name"],
+                    "Territorio": territory,
+                    "TipoTerritorio": "NUTS III" if territory == "Alto Minho" else "Município",
+                    "Ano": dataset["year"],
+                    "Valor": dataset["values"][territory],
+                    "Unidade": dataset["unit"],
+                    "Dimensao": dataset["dimension"],
+                    "Dominio": item["domain"],
+                    "Tema": item["theme"],
+                    "Categoria": item["category"],
+                    "Fonte": item["source"],
+                    "FonteURL": item["url"],
+                })
+
+
 def main() -> None:
     values_by_name = read_javascript_object(VALUES_PATH, "indicatorValuesByName")
     if "--check-ine" in sys.argv:
@@ -440,6 +480,7 @@ def main() -> None:
         raise RuntimeError(f"Só {ine_count} indicadores INE passaram a validação")
     write_javascript_object(VALUES_PATH, "Valores atualizados automaticamente a partir do INE e da Pordata.", "indicatorValuesByName", values_by_name)
     update_catalog_links()
+    write_powerbi_dataset(values_by_name)
     REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Atualização concluída: {pordata_count} indicadores Pordata e {ine_count} indicadores INE verificados.")
 

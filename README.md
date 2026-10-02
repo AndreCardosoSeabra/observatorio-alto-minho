@@ -21,3 +21,5 @@ Os endereços permanentes usados para cada indicador Pordata estão em `data/por
 ## Alterações ao site
 
 Os textos e a estrutura visual podem ser editados diretamente em `index.html`, `styles.css` e `app.js`. As listas de indicadores e fontes ficam em `catalog-data.js`; os valores são geridos automaticamente e não devem ser alterados manualmente em `indicator-values.js`.
+
+O ficheiro `powerbi-data.csv` contém os mesmos dados num formato preparado para ligação direta pelo Power BI. É regenerado e publicado pelo workflow sempre que os indicadores são atualizados.

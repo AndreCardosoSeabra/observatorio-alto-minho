@@ -1,0 +1,28 @@
+{
+  "name": "Observatório Alto Minho",
+  "dataColors": ["#0F453A", "#EF735D", "#78B8C9", "#C8FF5A", "#739B86", "#E5B956", "#4E7C73", "#A7D3DE"],
+  "background": "#F3F4EC",
+  "foreground": "#10211D",
+  "tableAccent": "#0F453A",
+  "good": "#2C7A5B",
+  "neutral": "#E5B956",
+  "bad": "#C65342",
+  "maximum": "#0F453A",
+  "center": "#E5B956",
+  "minimum": "#D9EFF5",
+  "textClasses": {
+    "title": {"fontFace": "Segoe UI Semibold", "fontSize": 15, "color": "#10211D"},
+    "header": {"fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#10211D"},
+    "label": {"fontFace": "Segoe UI", "fontSize": 10, "color": "#52635E"},
+    "callout": {"fontFace": "Segoe UI Semibold", "fontSize": 28, "color": "#0F453A"}
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [{"show": true, "color": {"solid": {"color": "#FFFFFF"}}, "transparency": 0}],
+        "border": [{"show": false}],
+        "visualHeader": [{"show": true}]
+      }
+    }
+  }
+}
