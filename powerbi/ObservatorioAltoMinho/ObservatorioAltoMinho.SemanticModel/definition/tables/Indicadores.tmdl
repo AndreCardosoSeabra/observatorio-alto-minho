@@ -1,0 +1,186 @@
+table Indicadores
+
+	/// Valor do indicador no ano mais recente disponível para o contexto selecionado.
+	measure 'Valor atual' = ```
+		VAR _AnoMaisRecente = MAX('Indicadores'[Ano])
+		RETURN CALCULATE(MAX('Indicadores'[Valor]), KEEPFILTERS('Indicadores'[Ano] = _AnoMaisRecente))
+		```
+		formatString: #,##0.00
+		displayFolder: Medidas dinâmicas
+
+	/// Último ano com dados no contexto selecionado.
+	measure 'Último ano' = MAX('Indicadores'[Ano])
+		formatString: 0
+		displayFolder: Medidas dinâmicas
+
+	/// Número de indicadores distintos disponíveis no contexto selecionado.
+	measure 'Indicadores disponíveis' = DISTINCTCOUNT('Indicadores'[Indicador])
+		formatString: #,##0
+		displayFolder: Cobertura
+
+	/// Número de registos carregados no contexto selecionado.
+	measure 'Registos disponíveis' = COUNTROWS('Indicadores')
+		formatString: #,##0
+		displayFolder: Cobertura
+
+	/// Número de municípios com dados no contexto selecionado.
+	measure 'Municípios disponíveis' = CALCULATE(DISTINCTCOUNT('Indicadores'[Município]), 'Indicadores'[Tipo de território] = "Município")
+		formatString: #,##0
+		displayFolder: Cobertura
+
+	/// Valor do indicador selecionado para o Alto Minho.
+	measure 'Valor Alto Minho' = ```
+		VAR _AnoMaisRecente = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'[Território]), 'Indicadores'[Território] = "Alto Minho")
+		RETURN CALCULATE(MAX('Indicadores'[Valor]), REMOVEFILTERS('Indicadores'[Território]), 'Indicadores'[Território] = "Alto Minho", 'Indicadores'[Ano] = _AnoMaisRecente)
+		```
+		formatString: #,##0.00
+		displayFolder: Comparação
+
+	/// Diferença percentual entre o município e o Alto Minho para o indicador selecionado.
+	measure 'Diferença face ao Alto Minho' = DIVIDE([Valor atual] - [Valor Alto Minho], [Valor Alto Minho])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Comparação
+
+	/// População residente do Alto Minho no ano mais recente disponível.
+	measure 'População residente' = ```
+		VAR _Ano = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "População residente: total 2015 a 2025", 'Indicadores'[Território] = "Alto Minho")
+		RETURN CALCULATE(MAX('Indicadores'[Valor]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "População residente: total 2015 a 2025", 'Indicadores'[Território] = "Alto Minho", 'Indicadores'[Ano] = _Ano)
+		```
+		formatString: #,##0
+		displayFolder: Retrato territorial
+
+	/// População residente por município, usada no mapa e no ranking municipal.
+	measure 'População municipal' = ```
+		VAR _Ano = CALCULATE(MAX('Indicadores'[Ano]), 'Indicadores'[Indicador] = "População residente: total 2015 a 2025")
+		RETURN IF(ISINSCOPE('Indicadores'[Município]), CALCULATE(MAX('Indicadores'[Valor]), 'Indicadores'[Indicador] = "População residente: total 2015 a 2025", 'Indicadores'[Ano] = _Ano))
+		```
+		formatString: #,##0
+		displayFolder: Retrato territorial
+
+	/// Densidade populacional do Alto Minho no ano mais recente disponível.
+	measure 'Densidade populacional' = ```
+		VAR _Ano = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Densidade populacional", 'Indicadores'[Território] = "Alto Minho")
+		RETURN CALCULATE(MAX('Indicadores'[Valor]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Densidade populacional", 'Indicadores'[Território] = "Alto Minho", 'Indicadores'[Ano] = _Ano)
+		```
+		formatString: #,##0.0
+		displayFolder: Retrato territorial
+
+	/// Índice de envelhecimento do Alto Minho no ano mais recente disponível.
+	measure 'Índice de envelhecimento' = ```
+		VAR _Ano = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Índice de envelhecimento", 'Indicadores'[Território] = "Alto Minho")
+		RETURN CALCULATE(MAX('Indicadores'[Valor]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Índice de envelhecimento", 'Indicadores'[Território] = "Alto Minho", 'Indicadores'[Ano] = _Ano)
+		```
+		formatString: #,##0.0
+		displayFolder: Retrato territorial
+
+	/// Rendimento médio do Alto Minho no ano mais recente disponível.
+	measure 'Rendimento médio' = ```
+		VAR _Ano = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Rendimento médio", 'Indicadores'[Território] = "Alto Minho")
+		RETURN CALCULATE(MAX('Indicadores'[Valor]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Rendimento médio", 'Indicadores'[Território] = "Alto Minho", 'Indicadores'[Ano] = _Ano)
+		```
+		formatString: #,##0.00
+		displayFolder: Retrato territorial
+
+	/// Preço mediano por metro quadrado no Alto Minho no ano mais recente disponível.
+	measure 'Preço médio por m²' = ```
+		VAR _Ano = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Preço médio m²", 'Indicadores'[Território] = "Alto Minho")
+		RETURN CALCULATE(MAX('Indicadores'[Valor]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Preço médio m²", 'Indicadores'[Território] = "Alto Minho", 'Indicadores'[Ano] = _Ano)
+		```
+		formatString: € #,##0 /m²
+		displayFolder: Retrato territorial
+
+	/// Saldo migratório do Alto Minho no ano mais recente disponível.
+	measure 'Saldo migratório' = ```
+		VAR _Ano = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Saldo Migratório", 'Indicadores'[Território] = "Alto Minho")
+		RETURN CALCULATE(MAX('Indicadores'[Valor]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Saldo Migratório", 'Indicadores'[Território] = "Alto Minho", 'Indicadores'[Ano] = _Ano)
+		```
+		formatString: #,##0
+		displayFolder: Retrato territorial
+
+	/// Nome do indicador estatístico.
+	column Indicador
+		dataType: string
+		sourceColumn: Indicador
+
+	/// Território a que o valor se refere.
+	column Território
+		dataType: string
+		sourceColumn: Territorio
+
+	/// Município, em branco para a linha agregada do Alto Minho.
+	column Município
+		dataType: string
+		sourceColumn: Municipio
+		dataCategory: City
+
+	/// Localização completa usada pela geocodificação do mapa.
+	column Localização
+		dataType: string
+		sourceColumn: Localizacao
+		dataCategory: City
+
+	/// Nível territorial do registo.
+	column 'Tipo de território'
+		dataType: string
+		sourceColumn: TipoTerritorio
+
+	/// Ano de referência do valor.
+	column Ano
+		dataType: int64
+		formatString: 0
+		sourceColumn: Ano
+		summarizeBy: none
+
+	/// Valor numérico do indicador.
+	column Valor
+		dataType: decimal
+		isHidden
+		sourceColumn: Valor
+
+	/// Unidade estatística do valor.
+	column Unidade
+		dataType: string
+		sourceColumn: Unidade
+
+	/// Dimensão analítica do indicador.
+	column Dimensão
+		dataType: string
+		sourceColumn: Dimensao
+
+	/// Domínio temático principal.
+	column Domínio
+		dataType: string
+		sourceColumn: Dominio
+
+	/// Tema complementar do indicador.
+	column Tema
+		dataType: string
+		sourceColumn: Tema
+
+	/// Categoria de organização do catálogo.
+	column Categoria
+		dataType: string
+		sourceColumn: Categoria
+
+	/// Entidade que publica o indicador.
+	column Fonte
+		dataType: string
+		sourceColumn: Fonte
+
+	/// Ligação para a página de origem do indicador.
+	column 'URL da fonte'
+		dataType: string
+		sourceColumn: FonteURL
+		dataCategory: WebUrl
+
+	partition Indicadores = m
+		mode: import
+		source =
+				let
+				    FonteWeb = Csv.Document(Web.Contents("https://sistemainformacaocimaltominho.pt/powerbi-data.csv"), [Delimiter=",", Columns=12, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promovidos cabeçalhos" = Table.PromoteHeaders(FonteWeb, [PromoteAllScalars=true]),
+				    #"Convertidos tipos" = Table.TransformColumnTypes(#"Promovidos cabeçalhos", {{"Indicador", type text}, {"Territorio", type text}, {"TipoTerritorio", type text}, {"Ano", Int64.Type}, {"Valor", type number}, {"Unidade", type text}, {"Dimensao", type text}, {"Dominio", type text}, {"Tema", type text}, {"Categoria", type text}, {"Fonte", type text}, {"FonteURL", type text}}, "en-US"),
+				    #"Adicionado município" = Table.AddColumn(#"Convertidos tipos", "Municipio", each if [TipoTerritorio] = "Município" then [Territorio] else null, type text),
+				    #"Adicionada localização" = Table.AddColumn(#"Adicionado município", "Localizacao", each if [TipoTerritorio] = "Município" then [Territorio] & ", Viana do Castelo, Portugal" else null, type text)
+				in
+				    #"Adicionada localização"
