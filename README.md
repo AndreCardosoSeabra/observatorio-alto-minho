@@ -26,6 +26,6 @@ O ficheiro `powerbi-data.csv` contém os mesmos dados num formato preparado para
 
 ## Mostrar o dashboard do Power BI no site
 
-O site está preparado para apresentar diretamente o relatório do Power BI em ecrã completo. Depois de publicar o relatório no Power BI Service, copie o endereço de incorporação e coloque-o no campo `embedUrl` do ficheiro `dashboard-config.js`.
+O site está preparado para apresentar diretamente o relatório do Power BI em ecrã completo. Depois de publicar o relatório no Power BI Service, copie o endereço de incorporação e coloque-o no campo `embedUrl` do ficheiro `powerbi-config.js`.
 
 Enquanto esse campo estiver vazio, o site mantém automaticamente a versão HTML atual. Para um site público sem início de sessão, o endereço deve ser criado em **Ficheiro > Incorporar relatório > Publicar na Web (público)**. Esta opção só deve ser usada para informação que possa ficar acessível a qualquer pessoa.
