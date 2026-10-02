@@ -1,5 +1,7 @@
 .cache/
 node_modules/
+tmp/
+**/.pbi/
 __pycache__/
 data/update-report.json
 ine-*.json

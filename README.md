@@ -23,3 +23,9 @@ Os endereços permanentes usados para cada indicador Pordata estão em `data/por
 Os textos e a estrutura visual podem ser editados diretamente em `index.html`, `styles.css` e `app.js`. As listas de indicadores e fontes ficam em `catalog-data.js`; os valores são geridos automaticamente e não devem ser alterados manualmente em `indicator-values.js`.
 
 O ficheiro `powerbi-data.csv` contém os mesmos dados num formato preparado para ligação direta pelo Power BI. É regenerado e publicado pelo workflow sempre que os indicadores são atualizados.
+
+## Mostrar o dashboard do Power BI no site
+
+O site está preparado para apresentar diretamente o relatório do Power BI em ecrã completo. Depois de publicar o relatório no Power BI Service, copie o endereço de incorporação e coloque-o no campo `embedUrl` do ficheiro `powerbi-config.js`.
+
+Enquanto esse campo estiver vazio, o site mantém automaticamente a versão HTML atual. Para um site público sem início de sessão, o endereço deve ser criado em **Ficheiro > Incorporar relatório > Publicar na Web (público)**. Esta opção só deve ser usada para informação que possa ficar acessível a qualquer pessoa.
