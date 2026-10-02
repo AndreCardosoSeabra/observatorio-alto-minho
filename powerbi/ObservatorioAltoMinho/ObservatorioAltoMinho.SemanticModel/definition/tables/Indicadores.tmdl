@@ -109,6 +109,10 @@ table Indicadores
 		formatString: #,##0
 		displayFolder: Retrato territorial
 
+	measure 'Ano população residente' = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "População residente: total 2015 a 2025", 'Indicadores'[Território] = "Alto Minho")
+		formatString: 0
+		displayFolder: Retrato territorial
+
 	/// População residente por município, usada no mapa e no ranking municipal.
 	measure 'População municipal' = ```
 		VAR _Ano = CALCULATE(MAX('Indicadores'[Ano]), 'Indicadores'[Indicador] = "População residente: total 2015 a 2025")
@@ -133,6 +137,10 @@ table Indicadores
 		formatString: #,##0.0
 		displayFolder: Retrato territorial
 
+	measure 'Ano índice de envelhecimento' = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Índice de envelhecimento", 'Indicadores'[Território] = "Alto Minho")
+		formatString: 0
+		displayFolder: Retrato territorial
+
 	/// Rendimento médio do Alto Minho no ano mais recente disponível.
 	measure 'Rendimento médio' = ```
 		VAR _Ano = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Rendimento médio", 'Indicadores'[Território] = "Alto Minho")
@@ -149,12 +157,20 @@ table Indicadores
 		formatString: € #,##0 /m²
 		displayFolder: Retrato territorial
 
+	measure 'Ano preço médio por m²' = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Preço médio m²", 'Indicadores'[Território] = "Alto Minho")
+		formatString: 0
+		displayFolder: Retrato territorial
+
 	/// Saldo migratório do Alto Minho no ano mais recente disponível.
 	measure 'Saldo migratório' = ```
 		VAR _Ano = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Saldo Migratório", 'Indicadores'[Território] = "Alto Minho")
 		RETURN CALCULATE(MAX('Indicadores'[Valor]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Saldo Migratório", 'Indicadores'[Território] = "Alto Minho", 'Indicadores'[Ano] = _Ano)
 		```
 		formatString: #,##0
+		displayFolder: Retrato territorial
+
+	measure 'Ano saldo migratório' = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Saldo Migratório", 'Indicadores'[Território] = "Alto Minho")
+		formatString: 0
 		displayFolder: Retrato territorial
 
 	/// Nome do indicador estatístico.

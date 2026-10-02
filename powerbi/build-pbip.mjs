@@ -41,7 +41,7 @@ function position(x, y, width, height, z, tabOrder = z) {
   return { x, y, z, height, width, tabOrder };
 }
 
-function textbox(text, x, y, width, height, size = 18, color = C.ink, weight = "normal", family = "Segoe UI") {
+function textbox(text, x, y, width, height, size = 18, color = C.ink, weight = "normal", family = "Segoe UI", alignment = "left") {
   const name = hex();
   return {
     name,
@@ -53,7 +53,7 @@ function textbox(text, x, y, width, height, size = 18, color = C.ink, weight = "
         visualType: "textbox",
         objects: { general: [{ properties: { paragraphs: [{
           textRuns: [{ value: text, textStyle: { fontFamily: family, fontSize: `${size}px`, fontWeight: weight, color } }],
-          horizontalTextAlignment: "left"
+          horizontalTextAlignment: alignment
         }] } }] },
         visualContainerObjects: {
           background: [{ properties: { show: lit("false") } }],
@@ -104,10 +104,12 @@ function card(measureName, x, y, width, height, options = {}) {
         visualType: "cardVisual",
         query: { queryState: { Data: { projections: [projection(measure(measureName), `Indicadores.${measureName}`, measureName)] } } },
         objects: {
-          value: [{ properties: { fontSize: lit(`${options.valueSize ?? 24}D`), fontFamily: lit(`'${options.valueFamily ?? "Segoe UI"}'`), fontColor: { solid: { color: lit(`'${valueColor}'`) } }, bold: lit(options.valueBold ? "true" : "false"), labelDisplayUnits: lit("1D") }, selector: { id: "default" } }],
-          label: [{ properties: { fontSize: lit(`${options.labelSize ?? 10}D`), fontColor: { solid: { color: lit(`'${labelColor}'`) } }, ...(options.labelText ? { text: lit(`'${options.labelText}'`) } : {}) }, selector: { id: "default" } }],
+          value: [{ properties: { show: lit("true"), fontSize: lit(`${options.valueSize ?? 24}D`), fontFamily: lit(`'${options.valueFamily ?? "Segoe UI"}'`), fontColor: { solid: { color: lit(`'${valueColor}'`) } }, bold: lit(options.valueBold ? "true" : "false"), horizontalAlignment: lit(`'${options.align ?? "left"}'`), labelDisplayUnits: lit("1D") }, selector: { id: "default" } }],
+          label: [{ properties: { show: lit(options.labelShow === false ? "false" : "true"), fontSize: lit(`${options.labelSize ?? 10}D`), fontColor: { solid: { color: lit(`'${labelColor}'`) } }, horizontalAlignment: lit(`'${options.labelAlign ?? options.align ?? "left"}'`), ...(options.labelText ? { text: lit(`'${options.labelText}'`) } : {}) }, selector: { id: "default" } }],
           padding: [{ properties: { paddingUniform: lit(`${options.padding ?? 8}D`) }, selector: { id: "default" } }],
-          layout: [{ properties: { paddingUniform: lit("0D"), backgroundShow: lit("false") }, selector: { id: "default" } }]
+          layout: [{ properties: { paddingUniform: lit("0D"), backgroundShow: lit("false"), backgroundTransparency: lit("100D") }, selector: { id: "default" } }],
+          cardCalloutArea: [{ properties: { show: lit("false"), backgroundTransparency: lit("100D"), paddingUniform: lit("0D") } }],
+          fillCustom: [{ properties: { show: lit("false"), transparency: lit("100D") }, selector: { id: "default" } }]
         },
         visualContainerObjects: {
           background: [{ properties: { show: lit(options.transparent ? "false" : "true"), color: { solid: { color: lit(`'${background}'`) } }, transparency: lit("0D") } }],
@@ -445,6 +447,10 @@ const tableTmdl = `table Indicadores
 \t\tformatString: #,##0
 \t\tdisplayFolder: Retrato territorial
 
+\tmeasure 'Ano população residente' = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "População residente: total 2015 a 2025", 'Indicadores'[Território] = "Alto Minho")
+\t\tformatString: 0
+\t\tdisplayFolder: Retrato territorial
+
 \t/// População residente por município, usada no mapa e no ranking municipal.
 \tmeasure 'População municipal' = \`\`\`
 \t\tVAR _Ano = CALCULATE(MAX('Indicadores'[Ano]), 'Indicadores'[Indicador] = "População residente: total 2015 a 2025")
@@ -469,6 +475,10 @@ const tableTmdl = `table Indicadores
 \t\tformatString: #,##0.0
 \t\tdisplayFolder: Retrato territorial
 
+\tmeasure 'Ano índice de envelhecimento' = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Índice de envelhecimento", 'Indicadores'[Território] = "Alto Minho")
+\t\tformatString: 0
+\t\tdisplayFolder: Retrato territorial
+
 \t/// Rendimento médio do Alto Minho no ano mais recente disponível.
 \tmeasure 'Rendimento médio' = \`\`\`
 \t\tVAR _Ano = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Rendimento médio", 'Indicadores'[Território] = "Alto Minho")
@@ -485,12 +495,20 @@ const tableTmdl = `table Indicadores
 \t\tformatString: € #,##0 /m²
 \t\tdisplayFolder: Retrato territorial
 
+\tmeasure 'Ano preço médio por m²' = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Preço médio m²", 'Indicadores'[Território] = "Alto Minho")
+\t\tformatString: 0
+\t\tdisplayFolder: Retrato territorial
+
 \t/// Saldo migratório do Alto Minho no ano mais recente disponível.
 \tmeasure 'Saldo migratório' = \`\`\`
 \t\tVAR _Ano = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Saldo Migratório", 'Indicadores'[Território] = "Alto Minho")
 \t\tRETURN CALCULATE(MAX('Indicadores'[Valor]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Saldo Migratório", 'Indicadores'[Território] = "Alto Minho", 'Indicadores'[Ano] = _Ano)
 \t\t\`\`\`
 \t\tformatString: #,##0
+\t\tdisplayFolder: Retrato territorial
+
+\tmeasure 'Ano saldo migratório' = CALCULATE(MAX('Indicadores'[Ano]), REMOVEFILTERS('Indicadores'), 'Indicadores'[Indicador] = "Saldo Migratório", 'Indicadores'[Território] = "Alto Minho")
+\t\tformatString: 0
 \t\tdisplayFolder: Retrato territorial
 
 \t/// Nome do indicador estatístico.
@@ -644,11 +662,22 @@ buildPage(p1, "01 Retrato territorial", [
   textbox("Indicadores de síntese", 765, 410, 350, 40, 25, C.white, "normal", "Georgia"),
   textbox("Último ano disponível", 1305, 416, 175, 24, 12, "#9DB8AE"),
   shape(765, 458, 715, 1, "#4E7067", 110),
-  card("População residente", 765, 470, 330, 76, { transparent: true, border: false, valueColor: C.white, labelColor: "#C0D0CA", valueSize: 30, valueFamily: "Georgia", padding: 0 }),
-  card("Índice de envelhecimento", 1112, 470, 368, 76, { transparent: true, border: false, valueColor: C.white, labelColor: "#C0D0CA", valueSize: 30, valueFamily: "Georgia", padding: 0 }),
-  shape(765, 554, 715, 1, "#4E7067", 110),
-  card("Preço médio por m²", 765, 568, 330, 76, { transparent: true, border: false, valueColor: C.white, labelColor: "#C0D0CA", valueSize: 30, valueFamily: "Georgia", padding: 0 }),
-  card("Saldo migratório", 1112, 568, 368, 76, { transparent: true, border: false, valueColor: C.white, labelColor: "#C0D0CA", valueSize: 30, valueFamily: "Georgia", padding: 0 })
+  card("Ano população residente", 765, 468, 88, 38, { transparent: true, border: false, labelShow: false, valueColor: C.lime, valueSize: 10, valueBold: true, padding: 0 }),
+  card("População residente", 870, 464, 275, 44, { transparent: true, border: false, labelShow: false, valueColor: C.white, valueSize: 27, valueFamily: "Georgia", padding: 0 }),
+  textbox("População residente", 1180, 477, 300, 24, 12, "#D5E1DC", "normal", "Segoe UI", "right"),
+  shape(765, 511, 715, 1, "#4E7067", 110),
+  card("Ano índice de envelhecimento", 765, 520, 88, 38, { transparent: true, border: false, labelShow: false, valueColor: C.lime, valueSize: 10, valueBold: true, padding: 0 }),
+  card("Índice de envelhecimento", 870, 516, 275, 44, { transparent: true, border: false, labelShow: false, valueColor: C.white, valueSize: 27, valueFamily: "Georgia", padding: 0 }),
+  textbox("Índice de envelhecimento", 1180, 529, 300, 24, 12, "#D5E1DC", "normal", "Segoe UI", "right"),
+  shape(765, 563, 715, 1, "#4E7067", 110),
+  card("Ano preço médio por m²", 765, 572, 88, 38, { transparent: true, border: false, labelShow: false, valueColor: C.lime, valueSize: 10, valueBold: true, padding: 0 }),
+  card("Preço médio por m²", 870, 568, 275, 44, { transparent: true, border: false, labelShow: false, valueColor: C.white, valueSize: 27, valueFamily: "Georgia", padding: 0 }),
+  textbox("Preço médio por m²", 1180, 581, 300, 24, 12, "#D5E1DC", "normal", "Segoe UI", "right"),
+  shape(765, 615, 715, 1, "#4E7067", 110),
+  card("Ano saldo migratório", 765, 624, 88, 38, { transparent: true, border: false, labelShow: false, valueColor: C.lime, valueSize: 10, valueBold: true, padding: 0 }),
+  card("Saldo migratório", 870, 620, 275, 44, { transparent: true, border: false, labelShow: false, valueColor: C.white, valueSize: 27, valueFamily: "Georgia", padding: 0 }),
+  textbox("Saldo migratório", 1180, 633, 300, 24, 12, "#D5E1DC", "normal", "Segoe UI", "right"),
+  shape(765, 667, 715, 1, "#4E7067", 110)
 ]);
 
 buildPage(p2, "02 Comparação municipal", [
