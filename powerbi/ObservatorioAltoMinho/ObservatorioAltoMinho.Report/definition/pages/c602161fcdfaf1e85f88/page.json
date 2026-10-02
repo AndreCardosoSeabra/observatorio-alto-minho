@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
-  "name": "76f7c1e691fd43c485ec",
-  "displayName": "01 Retrato territorial",
+  "name": "c602161fcdfaf1e85f88",
+  "displayName": "02 Comparação municipal",
   "displayOption": "FitToPage",
   "height": 720,
   "width": 1600,
@@ -14,7 +14,7 @@
               "color": {
                 "expr": {
                   "Literal": {
-                    "Value": "'#F3F4EC'"
+                    "Value": "'#FFE3DA'"
                   }
                 }
               }

@@ -20,11 +20,11 @@ O ficheiro é atualizado pelo mesmo GitHub Actions que atualiza o site. A consul
 
 ### 02 — Comparação municipal
 
-- seletores de domínio, indicador e município;
+- composição visual equivalente à secção coral do site;
+- seletor único do indicador;
 - ranking horizontal dos dez municípios;
-- valor do Alto Minho como referência;
-- diferença absoluta e percentual face ao Alto Minho;
-- tabela detalhada com ano, unidade e fonte.
+- população residente como seleção inicial segura;
+- atualização automática quando é escolhido outro indicador.
 
 ### 03 — Catálogo de indicadores
 
@@ -42,7 +42,9 @@ O ficheiro é atualizado pelo mesmo GitHub Actions que atualiza o site. A consul
 
 ## Identidade visual
 
-Importar `tema-alto-minho.json` em **Ver > Temas > Procurar temas**.
+O relatório já inclui a identidade do site: fundos creme, coral e verde, títulos editoriais, índices `01–04` e hierarquia visual equivalente. O ficheiro `tema-alto-minho.json` pode ser usado noutros relatórios.
+
+O relatório foi preparado para ser incorporado no site. Depois de o publicar no Power BI Service, a ligação de incorporação deve ser colocada no HTML do site; até essa ligação existir, o site e o relatório continuam a consultar separadamente o mesmo ficheiro `powerbi-data.csv`.
 
 ## Medidas
 

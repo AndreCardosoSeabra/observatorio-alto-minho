@@ -8,6 +8,32 @@ table Indicadores
 		formatString: #,##0.00
 		displayFolder: Medidas dinâmicas
 
+	/// Indicador escolhido no seletor; usa população residente quando ainda não existe uma seleção única.
+	measure 'Indicador em análise' = SELECTEDVALUE('Indicadores'[Indicador], "População residente: total 2015 a 2025")
+		displayFolder: Medidas dinâmicas
+
+	/// Valor municipal do indicador escolhido no ano mais recente comum disponível.
+	measure 'Valor municipal selecionado' = ```
+		VAR _Indicador = [Indicador em análise]
+		VAR _AnoMaisRecente =
+			CALCULATE(
+				MAX('Indicadores'[Ano]),
+				REMOVEFILTERS('Indicadores'[Indicador], 'Indicadores'[Ano], 'Indicadores'[Território], 'Indicadores'[Município]),
+				'Indicadores'[Indicador] = _Indicador,
+				'Indicadores'[Tipo de território] = "Município"
+			)
+		RETURN
+			CALCULATE(
+				MAX('Indicadores'[Valor]),
+				REMOVEFILTERS('Indicadores'[Indicador], 'Indicadores'[Ano]),
+				'Indicadores'[Indicador] = _Indicador,
+				'Indicadores'[Ano] = _AnoMaisRecente,
+				'Indicadores'[Tipo de território] = "Município"
+			)
+		```
+		formatString: #,##0.##
+		displayFolder: Comparação
+
 	/// Último ano com dados no contexto selecionado.
 	measure 'Último ano' = MAX('Indicadores'[Ano])
 		formatString: 0

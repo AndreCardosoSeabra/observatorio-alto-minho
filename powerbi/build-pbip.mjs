@@ -17,7 +17,7 @@ const pagesSchema = "https://developer.microsoft.com/json-schemas/fabric/item/re
 
 const C = {
   green: "#0F453A", coral: "#EF735D", blue: "#78B8C9", lime: "#C8FF5A",
-  cream: "#F3F4EC", ink: "#10211D", muted: "#61716C", white: "#FFFFFF", pale: "#DDECEF"
+  cream: "#F3F4EC", blush: "#FFE3DA", ink: "#10211D", muted: "#61716C", white: "#FFFFFF", pale: "#DDECEF"
 };
 
 const lit = value => ({ expr: { Literal: { Value: value } } });
@@ -116,8 +116,10 @@ function card(measureName, x, y, width, height) {
   };
 }
 
-function slicer(property, label, x, y, width) {
+function slicer(property, label, x, y, width, options = {}) {
   const name = hex();
+  const background = options.background ?? C.white;
+  const transparent = options.transparent ?? false;
   return {
     name,
     json: {
@@ -132,9 +134,43 @@ function slicer(property, label, x, y, width) {
           header: [{ properties: { show: lit("true"), text: lit(`'${label}'`) } }]
         },
         visualContainerObjects: {
-          background: [{ properties: { show: lit("true"), color: { solid: { color: lit(`'${C.white}'`) } }, transparency: lit("0D") } }],
-          border: [{ properties: { show: lit("true"), color: { solid: { color: lit("'#D6DFDB'") } }, radius: lit("8D"), width: lit("1D") } }],
+          background: [{ properties: { show: lit(transparent ? "false" : "true"), color: { solid: { color: lit(`'${background}'`) } }, transparency: lit("0D") } }],
+          border: [{ properties: { show: lit(options.border === false ? "false" : "true"), color: { solid: { color: lit("'#D6DFDB'") } }, radius: lit("8D"), width: lit("1D") } }],
           padding: [{ properties: { top: lit("8D"), bottom: lit("8D"), left: lit("8D"), right: lit("8D") } }]
+        }
+      }
+    }
+  };
+}
+
+function comparisonBar(x, y, width, height) {
+  const name = hex();
+  return {
+    name,
+    json: {
+      $schema: visualSchema,
+      name,
+      position: position(x, y, width, height, 7000, 7000),
+      visual: {
+        visualType: "clusteredBarChart",
+        query: {
+          queryState: {
+            Category: { projections: [projection(column("Município"), "Indicadores.Município", "Município", true)] },
+            Y: { projections: [projection(measure("Valor municipal selecionado"), "Indicadores.Valor municipal selecionado", "Valor municipal selecionado")] }
+          },
+          sortDefinition: { sort: [{ field: measure("Valor municipal selecionado"), direction: "Descending" }] }
+        },
+        objects: {
+          categoryAxis: [{ properties: { show: lit("true"), fontSize: lit("12D"), innerPadding: lit("42L"), labelColor: { solid: { color: lit(`'${C.ink}'`) } } } }],
+          valueAxis: [{ properties: { show: lit("false") } }],
+          labels: [{ properties: { show: lit("true"), fontSize: lit("11D"), color: { solid: { color: lit(`'${C.ink}'`) } }, labelPosition: lit("'OutsideEnd'") } }],
+          dataPoint: [{ properties: { fill: { solid: { color: lit(`'${C.coral}'`) } } } }]
+        },
+        visualContainerObjects: {
+          background: [{ properties: { show: lit("false") } }],
+          border: [{ properties: { show: lit("false") } }],
+          visualHeader: [{ properties: { show: lit("false") } }],
+          padding: [{ properties: { top: lit("0D"), bottom: lit("0D"), left: lit("0D"), right: lit("0D") } }]
         }
       }
     }
@@ -222,14 +258,14 @@ function table(fields, x, y, width, height) {
   };
 }
 
-function buildPage(id, displayName, visuals) {
+function buildPage(id, displayName, visuals, background = C.cream) {
   const dir = path.join(pagesDir, id);
   fs.rmSync(path.join(dir, "visuals"), { recursive: true, force: true });
   fs.mkdirSync(path.join(dir, "visuals"), { recursive: true });
   writeJson(path.join(dir, "page.json"), {
-    $schema: pageSchema, name: id, displayName, displayOption: "FitToPage", height: 720, width: 1280,
+    $schema: pageSchema, name: id, displayName, displayOption: "FitToPage", height: 720, width: 1600,
     objects: {
-      background: [{ properties: { color: { solid: { color: lit(`'${C.cream}'`) } }, transparency: lit("0D") } }],
+      background: [{ properties: { color: { solid: { color: lit(`'${background}'`) } }, transparency: lit("0D") } }],
       outspace: [{ properties: { color: { solid: { color: lit(`'${C.green}'`) } }, transparency: lit("0D") } }]
     }
   });
@@ -274,6 +310,32 @@ const tableTmdl = `table Indicadores
 \t\t\`\`\`
 \t\tformatString: #,##0.00
 \t\tdisplayFolder: Medidas dinâmicas
+
+\t/// Indicador escolhido no seletor; usa população residente quando ainda não existe uma seleção única.
+\tmeasure 'Indicador em análise' = SELECTEDVALUE('Indicadores'[Indicador], "População residente: total 2015 a 2025")
+\t\tdisplayFolder: Medidas dinâmicas
+
+\t/// Valor municipal do indicador escolhido no ano mais recente comum disponível.
+\tmeasure 'Valor municipal selecionado' = \`\`\`
+\t\tVAR _Indicador = [Indicador em análise]
+\t\tVAR _AnoMaisRecente =
+\t\t\tCALCULATE(
+\t\t\t\tMAX('Indicadores'[Ano]),
+\t\t\t\tREMOVEFILTERS('Indicadores'[Indicador], 'Indicadores'[Ano], 'Indicadores'[Território], 'Indicadores'[Município]),
+\t\t\t\t'Indicadores'[Indicador] = _Indicador,
+\t\t\t\t'Indicadores'[Tipo de território] = "Município"
+\t\t\t)
+\t\tRETURN
+\t\t\tCALCULATE(
+\t\t\t\tMAX('Indicadores'[Valor]),
+\t\t\t\tREMOVEFILTERS('Indicadores'[Indicador], 'Indicadores'[Ano]),
+\t\t\t\t'Indicadores'[Indicador] = _Indicador,
+\t\t\t\t'Indicadores'[Ano] = _AnoMaisRecente,
+\t\t\t\t'Indicadores'[Tipo de território] = "Município"
+\t\t\t)
+\t\t\`\`\`
+\t\tformatString: #,##0.##
+\t\tdisplayFolder: Comparação
 
 \t/// Último ano com dados no contexto selecionado.
 \tmeasure 'Último ano' = MAX('Indicadores'[Ano])
@@ -493,64 +555,75 @@ const p3 = pageId();
 const p4 = pageId();
 
 buildPage(p1, "01 Retrato territorial", [
-  ...chrome(1, "Conhecer o território. Decidir com contexto.", "Dados oficiais do Alto Minho, organizados para apoiar a leitura e a decisão."),
-  slicer("Território", "Território em análise", 1020, 24, 230),
-  textbox("Indicadores de síntese", 250, 132, 300, 26, 16, C.ink, "bold"),
-  textbox("Último ano disponível", 1050, 134, 200, 22, 11, C.muted),
-  card("População residente", 250, 164, 225, 106),
-  card("Índice de envelhecimento", 492, 164, 225, 106),
-  card("Preço médio por m²", 734, 164, 225, 106),
-  card("Saldo migratório", 976, 164, 275, 106),
-  textbox("Mapa municipal", 250, 286, 250, 28, 17, C.ink, "bold"),
-  textbox("Comparação municipal", 748, 286, 310, 28, 17, C.ink, "bold"),
-  azureMap("Localização", "População municipal", 250, 318, 472, 370),
-  bar("Município", "População municipal", 742, 318, 509, 370)
+  textbox("CIM ALTO MINHO · RETRATO TERRITORIAL", 72, 50, 650, 24, 13, C.green, "bold"),
+  textbox("Conhecer o território.", 72, 82, 900, 82, 52, C.ink, "normal", "Georgia"),
+  textbox("Decidir com contexto.", 72, 150, 900, 82, 52, "#245B4C", "normal", "Georgia"),
+  shape(1112, 91, 4, 118, C.lime, 100),
+  slicer("Território", "Território em análise", 1148, 94, 370, { transparent: true, border: false }),
+  textbox("10 municípios · NUTS III Alto Minho", 1148, 178, 360, 24, 13, C.muted),
+  shape(72, 255, 1446, 1, "#D4DDD7", 100),
+  textbox("Território selecionado", 72, 276, 250, 22, 12, C.muted),
+  textbox("Alto Minho", 72, 304, 380, 60, 38, C.ink, "normal", "Georgia"),
+  textbox("●  Matriz de indicadores do projeto · fontes INE e Pordata", 1000, 322, 518, 22, 12, C.muted),
+  shape(72, 382, 655, 290, C.pale, 100),
+  textbox("Mapa municipal", 100, 408, 220, 36, 23, C.ink, "normal", "Georgia"),
+  textbox("Selecione um município para explorar os seus indicadores.", 465, 409, 220, 48, 12, "#557178"),
+  azureMap("Localização", "População municipal", 98, 462, 600, 180),
+  shape(727, 382, 791, 290, C.green, 100),
+  textbox("Indicadores de síntese", 765, 410, 350, 40, 25, C.white, "normal", "Georgia"),
+  textbox("Último ano disponível", 1305, 416, 175, 24, 12, "#9DB8AE"),
+  card("População residente", 765, 468, 330, 82),
+  card("Índice de envelhecimento", 1112, 468, 368, 82),
+  card("Preço médio por m²", 765, 566, 330, 82),
+  card("Saldo migratório", 1112, 566, 368, 82)
 ]);
 
 buildPage(p2, "02 Comparação municipal", [
-  ...chrome(2, "Dez municípios, uma escala comum.", "Selecione um indicador para comparar os municípios e a referência do Alto Minho."),
-  slicer("Indicador", "Indicador a comparar", 250, 130, 525),
-  slicer("Domínio", "Domínio", 795, 130, 215),
-  slicer("Fonte", "Fonte", 1030, 130, 220),
-  card("Valor Alto Minho", 250, 216, 230, 105),
-  card("Último ano", 498, 216, 190, 105),
-  card("Municípios disponíveis", 706, 216, 230, 105),
-  card("Diferença face ao Alto Minho", 954, 216, 296, 105),
-  textbox("Ranking municipal", 250, 334, 250, 28, 17, C.ink, "bold"),
-  textbox("Detalhe dos valores", 858, 334, 250, 28, 17, C.ink, "bold"),
-  bar("Município", "Valor atual", 250, 366, 586, 322),
-  table([{name:"Município"},{name:"Ano"},{name:"Valor atual",type:"measure"},{name:"Unidade"},{name:"Fonte"}], 856, 366, 394, 322)
-]);
+  textbox("02", 60, 98, 76, 75, 48, C.coral, "normal", "Georgia"),
+  textbox("BENCHMARKING MUNICIPAL", 154, 100, 380, 24, 13, C.green, "bold"),
+  textbox("Dez municípios,", 154, 136, 720, 69, 44, C.ink, "normal", "Georgia"),
+  textbox("uma escala comum", 154, 198, 720, 69, 44, C.ink, "normal", "Georgia"),
+  slicer("Indicador", "Indicador a comparar", 1110, 165, 360, { transparent: true, border: false }),
+  comparisonBar(150, 292, 1330, 376)
+], C.blush);
 
 buildPage(p3, "03 Catálogo de indicadores", [
-  ...chrome(3, "Encontrar um indicador", "Explore os 50 indicadores e filtre por domínio, tema, categoria ou fonte."),
-  slicer("Domínio", "Domínio", 250, 130, 240),
-  slicer("Tema", "Tema", 510, 130, 240),
-  slicer("Categoria", "Categoria", 770, 130, 240),
-  slicer("Fonte", "Fonte", 1030, 130, 220),
-  card("Indicadores disponíveis", 250, 216, 250, 105),
-  card("Registos disponíveis", 520, 216, 250, 105),
-  card("Último ano", 790, 216, 200, 105),
-  card("Municípios disponíveis", 1010, 216, 240, 105),
-  textbox("Matriz de dados", 250, 334, 300, 28, 17, C.ink, "bold"),
-  table([{name:"Indicador"},{name:"Dimensão"},{name:"Domínio"},{name:"Tema"},{name:"Categoria"},{name:"Fonte"},{name:"Ano"},{name:"Unidade"}], 250, 366, 1000, 322)
+  textbox("03", 72, 60, 76, 75, 48, C.coral, "normal", "Georgia"),
+  textbox("CATÁLOGO · 50 INDICADORES", 160, 68, 380, 24, 13, C.green, "bold"),
+  textbox("Encontrar um indicador", 160, 105, 720, 66, 42, C.ink, "normal", "Georgia"),
+  slicer("Indicador", "Pesquisar por nome ou área", 1110, 84, 408, { transparent: true, border: false }),
+  shape(72, 198, 1446, 1, C.ink, 100),
+  slicer("Domínio", "Área", 72, 220, 270, { transparent: true, border: false }),
+  slicer("Tema", "Tema", 362, 220, 270, { transparent: true, border: false }),
+  slicer("Fonte", "Fonte", 652, 220, 250, { transparent: true, border: false }),
+  card("Indicadores disponíveis", 930, 220, 270, 82),
+  card("Último ano", 1218, 220, 300, 82),
+  table([{name:"Indicador"},{name:"Domínio"},{name:"Ano"},{name:"Fonte"}], 72, 332, 1446, 336)
 ]);
 
 buildPage(p4, "04 Metodologia", [
-  ...chrome(4, "Dados comparáveis, decisões mais claras.", "Regras comuns de fonte, período e território para assegurar leituras consistentes."),
-  shape(250, 128, 470, 170, C.white, 2000),
-  textbox("Atualização semanal", 278, 150, 390, 36, 20, C.green, "bold"),
-  textbox("Todas as segundas-feiras, uma rotina automática consulta as fontes, valida os valores e publica um novo ficheiro para o site e para o Power BI.", 278, 193, 400, 82, 13, C.muted),
-  shape(742, 128, 508, 170, C.white, 2000),
-  textbox("Fontes e rastreabilidade", 770, 150, 410, 36, 20, C.green, "bold"),
-  textbox("Cada indicador conserva a entidade de origem e a ligação para a respetiva página no INE ou na Pordata. O ano apresentado é sempre o último disponível.", 770, 193, 430, 82, 13, C.muted),
-  card("Indicadores disponíveis", 250, 320, 250, 105),
-  card("Registos disponíveis", 520, 320, 250, 105),
-  card("Municípios disponíveis", 790, 320, 250, 105),
-  card("Último ano", 1060, 320, 190, 105),
-  textbox("Catálogo e ligações às fontes", 250, 444, 350, 28, 17, C.ink, "bold"),
-  table([{name:"Fonte"},{name:"Indicador"},{name:"Ano"},{name:"URL da fonte"}], 250, 476, 1000, 212)
-]);
+  textbox("04", 72, 64, 76, 75, 48, C.coral, "normal", "Georgia"),
+  textbox("METODOLOGIA", 72, 160, 300, 24, 13, C.lime, "bold"),
+  textbox("Dados comparáveis,", 72, 200, 620, 66, 42, C.white, "normal", "Georgia"),
+  textbox("decisões mais claras.", 72, 258, 620, 66, 42, C.white, "normal", "Georgia"),
+  textbox("O observatório organiza a informação estatística do Alto Minho com regras comuns de fonte, período e território.", 72, 350, 520, 76, 15, "#B7CBC4"),
+  shape(760, 80, 760, 1, "#67877E", 100),
+  textbox("Fontes documentadas", 760, 112, 245, 30, 16, C.lime, "bold"),
+  textbox("Cada indicador identifica a sua origem no INE, nos Censos ou na Pordata.", 1040, 112, 455, 52, 14, "#C4D4CE"),
+  shape(760, 184, 760, 1, "#52746B", 100),
+  textbox("Atualização rastreável", 760, 216, 245, 30, 16, C.lime, "bold"),
+  textbox("O sistema regista a série e o ano mais recente que foram validados.", 1040, 216, 455, 52, 14, "#C4D4CE"),
+  shape(760, 288, 760, 1, "#52746B", 100),
+  textbox("Escala territorial", 760, 320, 245, 30, 16, C.lime, "bold"),
+  textbox("São apresentados os dez municípios e o Alto Minho enquanto NUTS III.", 1040, 320, 455, 52, 14, "#C4D4CE"),
+  shape(760, 392, 760, 1, "#52746B", 100),
+  textbox("Comparação homogénea", 760, 424, 245, 30, 16, C.lime, "bold"),
+  textbox("A definição, unidade e período mantêm-se iguais entre territórios.", 1040, 424, 455, 52, 14, "#C4D4CE"),
+  shape(72, 556, 1448, 1, "#52746B", 100),
+  textbox("Protótipo funcional com valores da matriz do projeto, extraídos das bases de trabalho do INE e da Pordata.", 72, 586, 1000, 28, 12, "#91ABA1"),
+  card("Indicadores disponíveis", 1160, 574, 170, 76),
+  card("Último ano", 1348, 574, 170, 76)
+], C.green);
 
 writeJson(path.join(pagesDir, "pages.json"), { $schema: pagesSchema, pageOrder: [p1, p2, p3, p4], activePageName: p1 });
 
