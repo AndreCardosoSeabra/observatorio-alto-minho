@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Observatório territorial da CIM Alto Minho com indicadores municipais do INE e da Pordata.">
+  <title>Comparação municipal | Observatório Alto Minho</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body data-page="comparar">
+  <header class="rail">
+    <a class="brand" href="./index.html" aria-label="Observatório Alto Minho — início">
+      <span class="brand-symbol" aria-hidden="true"><i></i><i></i></span>
+      <span><b>Alto Minho</b><small>Observatório territorial</small></span>
+    </a>
+    <nav aria-label="Navegação principal">
+      <a href="./index.html"><span>01</span>Retrato</a>
+      <a class="active" aria-current="page" href="./comparar.html"><span>02</span>Comparar</a>
+      <a href="./indicadores.html"><span>03</span>Indicadores</a>
+      <a href="./metodologia.html"><span>04</span>Metodologia</a>
+    </nav>
+    <div class="rail-note">
+      <span class="source-dot"></span>
+      <p>Dados estatísticos<br><strong>INE · Pordata</strong></p>
+    </div>
+    <a class="source-link" href="./indicadores.html">Consultar catálogo <span>→</span></a>
+  </header>
+
+  <main id="top">
+    <section class="workspace page-workspace">
+      <section class="compare-section" id="comparar">
+        <div class="section-index">02</div>
+        <div class="compare-head">
+          <div>
+            <p class="overline">Benchmarking municipal</p>
+            <h2>Dez municípios,<br>uma escala comum</h2>
+          </div>
+          <label class="compare-control">Indicador a comparar
+            <select id="compare-indicator" aria-label="Indicador a comparar"></select>
+          </label>
+        </div>
+        <div class="chart" id="comparison-chart" aria-label="Comparação dos municípios"></div>
+      </section>
+    </section>
+  </main>
+  <script src="./catalog-data.js"></script>
+  <script src="./indicator-values.js"></script>
+  <script src="./map-data.js"></script>
+  <script src="./app.js"></script>
+  <script src="./powerbi-config.js"></script>
+  <script src="./powerbi-embed.js"></script>
+</body>
+</html>

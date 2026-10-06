@@ -54,15 +54,18 @@ const themes = {
 };
 
 const select = document.querySelector("#territory-select"), compareSelect = document.querySelector("#compare-indicator"), mapNodes = document.querySelector("#map-nodes");
-let selectedTerritory = "Alto Minho", selectedTheme = "Demografia", selectedIndicatorKey = byRawName(legacyNames.population).key;
+const savedTerritory = localStorage.getItem("observatorio-territory");
+const savedIndicatorKey = localStorage.getItem("observatorio-indicator");
+let selectedTerritory = territoryNames.includes(savedTerritory) ? savedTerritory : "Alto Minho";
+let selectedTheme = "Demografia";
+let selectedIndicatorKey = catalog.some(item => item.key === savedIndicatorKey) ? savedIndicatorKey : byRawName(legacyNames.population).key;
 const format = value => value == null || value === "—" ? "—" : typeof value === "string" ? value : new Intl.NumberFormat("pt-PT", { maximumFractionDigits:2 }).format(value);
 const formattedValue = (item, value) => `${item.prefix || ""}${format(value)}${item.suffix || ""}`;
 
-territoryNames.forEach(name => { const option=document.createElement("option"); option.value=name; option.textContent=name; select.appendChild(option); });
-catalog.forEach(item => { const option=document.createElement("option"); option.value=item.key; option.textContent=item.name; compareSelect.appendChild(option); });
-compareSelect.value = selectedIndicatorKey;
+if(select) territoryNames.forEach(name => { const option=document.createElement("option"); option.value=name; option.textContent=name; select.appendChild(option); });
+if(compareSelect){catalog.forEach(item => { const option=document.createElement("option"); option.value=item.key; option.textContent=item.name; compareSelect.appendChild(option); });compareSelect.value=selectedIndicatorKey;}
 
-municipalityMapShapes.forEach(({ name, path, label:[x,y] }) => {
+if(mapNodes) municipalityMapShapes.forEach(({ name, path, label:[x,y] }) => {
   const ns="http://www.w3.org/2000/svg", g=document.createElementNS(ns,"g"), shape=document.createElementNS(ns,"path"), title=document.createElementNS(ns,"title"), label=document.createElementNS(ns,"text");
   g.classList.add("municipality-node"); g.dataset.territory=name; g.setAttribute("tabindex","0"); g.setAttribute("role","button"); g.setAttribute("aria-label",`Selecionar ${name}`);
   shape.setAttribute("d",path); shape.setAttribute("fill-rule","evenodd"); title.textContent=name;
@@ -70,46 +73,51 @@ municipalityMapShapes.forEach(({ name, path, label:[x,y] }) => {
   g.append(shape,title,label); mapNodes.appendChild(g); g.addEventListener("click",()=>setTerritory(name)); g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setTerritory(name);}});
 });
 
-function setTerritory(name){ selectedTerritory=name; select.value=name; document.querySelector("#territory-title").textContent=name; document.querySelectorAll(".municipality-node").forEach(n=>n.classList.toggle("active",n.dataset.territory===name)); render(); }
+function setTerritory(name){ selectedTerritory=name; localStorage.setItem("observatorio-territory",name); if(select)select.value=name; const title=document.querySelector("#territory-title");if(title)title.textContent=name; document.querySelectorAll(".municipality-node").forEach(n=>n.classList.toggle("active",n.dataset.territory===name)); render(); }
 
 function renderKpis(data){
+  const target=document.querySelector("#kpi-grid");if(!target)return;
   const specs=[["population","População residente"],["ageing","Índice de envelhecimento"],["housing","Preço médio por m²"],["migration","Saldo migratório"]];
-  document.querySelector("#kpi-grid").innerHTML=specs.map(([key,label])=>{const item=byRawName(legacyNames[key]);return `<article class="kpi"><div class="year">${item.year}</div><div class="value">${formattedValue(item,data[key])}</div><div class="label">${label}</div></article>`;}).join("");
+  target.innerHTML=specs.map(([key,label])=>{const item=byRawName(legacyNames[key]);return `<article class="kpi"><div class="year">${item.year}</div><div class="value">${formattedValue(item,data[key])}</div><div class="label">${label}</div></article>`;}).join("");
 }
 
 function renderTheme(data){
+  if(!document.querySelector("#indicator-cards"))return;
   const theme=themes[selectedTheme]; document.querySelector("#theme-kicker").textContent=`Área de ${selectedTheme}`; document.querySelector("#theme-title").textContent=theme.title; document.querySelector("#theme-description").textContent=theme.description;
   document.querySelector("#indicator-cards").innerHTML=theme.cards(data).map(([value,label,rawName])=>{const item=byRawName(rawName);return `<article class="indicator"><strong>${formattedValue(item,value)}</strong><span>${label}</span><small>${item.year} · ${item.source}</small></article>`;}).join("");
 }
 
 function renderComparison(){
+  const chart=document.querySelector("#comparison-chart");if(!compareSelect||!chart)return;
   const item=catalog.find(entry=>entry.key===compareSelect.value)||catalog[0];
   const rows=territoryNames.slice(1).map(name=>[name,item.values[name]]).sort((a,b)=>(b[1]??-Infinity)-(a[1]??-Infinity));
-  const max=Math.max(...rows.map(([,value])=>Math.abs(value??0)),1); document.querySelector("#comparison-chart").setAttribute("aria-label",`${item.name}, ${item.year}, ${item.dimension}`);
-  document.querySelector("#comparison-chart").innerHTML=rows.map(([name,value])=>`<div class="bar-row ${name===selectedTerritory?'selected':''}"><div class="bar-label" title="${name}">${name}</div><div class="bar-track"><div class="bar-fill${value<0?' negative':''}" style="--bar:${value==null?0:Math.max(2,Math.abs(value)/max*100)}%"></div></div><div class="bar-value">${formattedValue(item,value)}</div></div>`).join("");
+  const max=Math.max(...rows.map(([,value])=>Math.abs(value??0)),1); chart.setAttribute("aria-label",`${item.name}, ${item.year}, ${item.dimension}`);
+  chart.innerHTML=rows.map(([name,value])=>`<div class="bar-row ${name===selectedTerritory?'selected':''}"><div class="bar-label" title="${name}">${name}</div><div class="bar-track"><div class="bar-fill${value<0?' negative':''}" style="--bar:${value==null?0:Math.max(2,Math.abs(value)/max*100)}%"></div></div><div class="bar-value">${formattedValue(item,value)}</div></div>`).join("");
 }
 
 function renderCatalog(query=""){
+  const body=document.querySelector("#catalog-body"),empty=document.querySelector("#catalog-empty");if(!body||!empty)return;
   const normalized=query.trim().toLocaleLowerCase("pt-PT"), matches=catalog.filter(item=>`${item.name} ${item.area} ${item.year} ${item.source} ${item.dimension}`.toLocaleLowerCase("pt-PT").includes(normalized));
-  document.querySelector("#catalog-body").innerHTML=matches.map(item=>`<tr class="catalog-row ${item.key===selectedIndicatorKey?'active':''}" tabindex="0" role="button" data-indicator-key="${item.key}" aria-label="Ver ${item.name}"><td>${item.name}</td><td>${item.area}</td><td>${item.year}</td><td>${item.source}</td></tr>`).join(""); document.querySelector("#catalog-empty").hidden=matches.length>0;
+  body.innerHTML=matches.map(item=>`<tr class="catalog-row ${item.key===selectedIndicatorKey?'active':''}" tabindex="0" role="button" data-indicator-key="${item.key}" aria-label="Ver ${item.name}"><td>${item.name}</td><td>${item.area}</td><td>${item.year}</td><td>${item.source}</td></tr>`).join(""); empty.hidden=matches.length>0;
   document.querySelectorAll(".catalog-row").forEach(row=>{const choose=()=>selectCatalogIndicator(row.dataset.indicatorKey);row.addEventListener("click",choose);row.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();choose();}});});
 }
 
 function renderCatalogDetail(){
+  if(!document.querySelector("#indicator-detail"))return;
   const item=catalog.find(entry=>entry.key===selectedIndicatorKey)||catalog[0]; document.querySelector("#detail-name").textContent=item.name; document.querySelector("#detail-description").textContent=item.description; document.querySelector("#detail-territory").textContent=selectedTerritory; document.querySelector("#detail-value").textContent=formattedValue(item,item.values[selectedTerritory]); document.querySelector("#detail-area").textContent=item.area; document.querySelector("#detail-year").textContent=item.year; document.querySelector("#detail-dimension").textContent=item.dimension; document.querySelector("#detail-source").textContent=item.source; document.querySelector("#detail-source-link").href=item.sourceUrl; document.querySelector("#indicator-compare-button").disabled=false;
 }
-function selectCatalogIndicator(key){if(!catalog.some(item=>item.key===key))return;selectedIndicatorKey=key;renderCatalogDetail();renderCatalog(document.querySelector("#indicator-search").value);}
+function selectCatalogIndicator(key){if(!catalog.some(item=>item.key===key))return;selectedIndicatorKey=key;localStorage.setItem("observatorio-indicator",key);renderCatalogDetail();renderCatalog(document.querySelector("#indicator-search")?.value||"");}
 function render(){const data=dataFor(selectedTerritory);renderKpis(data);renderTheme(data);renderComparison();renderCatalogDetail();}
 
-select.addEventListener("change",e=>setTerritory(e.target.value));
+if(select)select.addEventListener("change",e=>setTerritory(e.target.value));
 document.querySelectorAll(".theme").forEach(button=>button.addEventListener("click",()=>{selectedTheme=button.dataset.theme;document.querySelectorAll(".theme").forEach(b=>{const active=b===button;b.classList.toggle("active",active);b.setAttribute("aria-selected",String(active));});renderTheme(dataFor(selectedTerritory));}));
-document.querySelector("[data-open-source]").addEventListener("click",()=>document.querySelector("#indicadores").scrollIntoView({behavior:"smooth",block:"start"}));
-compareSelect.addEventListener("change",renderComparison); document.querySelector("#indicator-search").addEventListener("input",e=>renderCatalog(e.target.value));
-document.querySelector("#indicator-compare-button").addEventListener("click",()=>{compareSelect.value=selectedIndicatorKey;renderComparison();document.querySelector("#comparar").scrollIntoView({behavior:"smooth",block:"start"});});
+if(compareSelect)compareSelect.addEventListener("change",()=>{selectedIndicatorKey=compareSelect.value;localStorage.setItem("observatorio-indicator",selectedIndicatorKey);renderComparison();});
+const searchInput=document.querySelector("#indicator-search");if(searchInput)searchInput.addEventListener("input",e=>renderCatalog(e.target.value));
+const compareButton=document.querySelector("#indicator-compare-button");if(compareButton)compareButton.addEventListener("click",()=>{localStorage.setItem("observatorio-indicator",selectedIndicatorKey);window.location.href="./comparar.html";});
 
 if(document.modelContext?.registerTool){
   Promise.resolve(document.modelContext.registerTool({name:"select_territory",title:"Selecionar território",description:"Seleciona um município ou o Alto Minho e atualiza os indicadores visíveis.",inputSchema:{type:"object",properties:{territory:{type:"string",enum:territoryNames}},required:["territory"],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){if(!territoryNames.includes(input?.territory))throw new Error("Território inválido");setTerritory(input.territory);return{territory:selectedTerritory};}})).catch(()=>{});
   Promise.resolve(document.modelContext.registerTool({name:"show_theme",title:"Mostrar área temática",description:"Mostra os indicadores da área temática escolhida.",inputSchema:{type:"object",properties:{theme:{type:"string",enum:Object.keys(themes)}},required:["theme"],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){if(!themes[input?.theme])throw new Error("Área inválida");selectedTheme=input.theme;document.querySelectorAll(".theme").forEach(b=>{const active=b.dataset.theme===selectedTheme;b.classList.toggle("active",active);b.setAttribute("aria-selected",String(active));});renderTheme(dataFor(selectedTerritory));return{theme:selectedTheme,territory:selectedTerritory};}})).catch(()=>{});
 }
 
-renderCatalog(); setTerritory("Alto Minho");
+renderCatalog(); setTerritory(selectedTerritory);

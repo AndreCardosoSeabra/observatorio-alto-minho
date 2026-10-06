@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Observatório territorial da CIM Alto Minho com indicadores municipais do INE e da Pordata.">
+  <title>Indicadores | Observatório Alto Minho</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body data-page="indicadores">
+  <header class="rail">
+    <a class="brand" href="./index.html" aria-label="Observatório Alto Minho — início">
+      <span class="brand-symbol" aria-hidden="true"><i></i><i></i></span>
+      <span><b>Alto Minho</b><small>Observatório territorial</small></span>
+    </a>
+    <nav aria-label="Navegação principal">
+      <a href="./index.html"><span>01</span>Retrato</a>
+      <a href="./comparar.html"><span>02</span>Comparar</a>
+      <a class="active" aria-current="page" href="./indicadores.html"><span>03</span>Indicadores</a>
+      <a href="./metodologia.html"><span>04</span>Metodologia</a>
+    </nav>
+    <div class="rail-note">
+      <span class="source-dot"></span>
+      <p>Dados estatísticos<br><strong>INE · Pordata</strong></p>
+    </div>
+    <a class="source-link" href="./indicadores.html">Consultar catálogo <span>→</span></a>
+  </header>
+
+  <main id="top">
+    <section class="workspace page-workspace">
+      <div class="subpage-toolbar">
+        <div>
+          <p class="overline">Exploração territorial</p>
+          <h1>Catálogo de indicadores</h1>
+        </div>
+        <div class="territory-picker compact">
+          <label for="territory-select">Território em análise</label>
+          <select id="territory-select" aria-label="Escolha o território"></select>
+          <p>10 municípios · NUTS III Alto Minho</p>
+        </div>
+      </div>
+      <section class="catalog-section" id="indicadores">
+        <div class="catalog-head">
+          <div class="section-index">03</div>
+          <div>
+            <p class="overline">Catálogo · 50 indicadores</p>
+            <h2>Encontrar um indicador</h2>
+          </div>
+          <label class="search-control">
+            <span class="sr-only">Pesquisar indicadores</span>
+            <input id="indicator-search" type="search" placeholder="Pesquisar por nome ou área…">
+          </label>
+        </div>
+        <div class="indicator-detail" id="indicator-detail" aria-live="polite">
+          <div class="detail-copy">
+            <p class="overline">Indicador selecionado</p>
+            <h3 id="detail-name"></h3>
+            <p id="detail-description"></p>
+          </div>
+          <div class="detail-value">
+            <span id="detail-territory"></span>
+            <strong id="detail-value"></strong>
+          </div>
+          <dl class="detail-meta">
+            <div><dt>Área</dt><dd id="detail-area"></dd></div>
+            <div><dt>Ano</dt><dd id="detail-year"></dd></div>
+            <div><dt>Leitura</dt><dd id="detail-dimension"></dd></div>
+            <div><dt>Fonte</dt><dd><a id="detail-source-link" href="#" target="_blank" rel="noopener"><span id="detail-source"></span> ↗</a></dd></div>
+          </dl>
+          <button class="detail-action" id="indicator-compare-button" type="button">Comparar municípios <span>↓</span></button>
+        </div>
+        <div class="catalog-table-wrap">
+          <table>
+            <thead><tr><th>Indicador</th><th>Área</th><th>Ano</th><th>Fonte</th></tr></thead>
+            <tbody id="catalog-body"></tbody>
+          </table>
+          <p class="empty-state" id="catalog-empty" hidden>Nenhum indicador corresponde à pesquisa.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+  <script src="./catalog-data.js"></script>
+  <script src="./indicator-values.js"></script>
+  <script src="./map-data.js"></script>
+  <script src="./app.js"></script>
+  <script src="./powerbi-config.js"></script>
+  <script src="./powerbi-embed.js"></script>
+</body>
+</html>

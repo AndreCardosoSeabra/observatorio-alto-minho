@@ -57,11 +57,22 @@ h1, h2 { font-family: "DM Serif Display", serif; font-weight: 400; letter-spacin
 .source-dot { width: 8px; height: 8px; flex: 0 0 auto; margin-top: 5px; border-radius: 50%; background: var(--lime); }
 .rail-note p { color: #a9c0b8; font-size: 12px; line-height: 1.5; }
 .rail-note strong { color: #e7f0ec; font-weight: 500; }
-.source-link { padding: 0; border: 0; background: none; color: white; text-align: left; cursor: pointer; font-size: 13px; }
+.source-link { display: block; padding: 0; border: 0; background: none; color: white; text-align: left; text-decoration: none; cursor: pointer; font-size: 13px; }
 .source-link span { color: var(--lime); }
 
 main { margin-left: var(--rail); }
 .workspace { max-width: 1400px; margin: 0 auto; padding: 52px clamp(24px, 5vw, 78px) 80px; }
+.page-workspace { min-height: 100vh; }
+body[data-page="comparar"] main { background: #ffe3da; }
+body[data-page="metodologia"] main { background: var(--forest); }
+body[data-page="comparar"] .page-workspace,
+body[data-page="metodologia"] .page-workspace { padding-top: 0; padding-bottom: 0; }
+body[data-page="comparar"] .compare-section,
+body[data-page="metodologia"] .method-section { min-height: 100vh; }
+body[data-page="metodologia"] .method-section { margin-bottom: 0; }
+.subpage-toolbar { display: grid; grid-template-columns: 1fr 310px; gap: 60px; align-items: end; padding: 18px 0 46px; border-bottom: 1px solid var(--line); }
+.subpage-toolbar h1 { margin-bottom: 0; font-size: clamp(42px, 5vw, 68px); line-height: 1; }
+.territory-picker.compact { align-self: auto; margin-bottom: 0; }
 .overline { margin-bottom: 12px; color: var(--forest-2); font-size: 12px; font-weight: 600; letter-spacing: .13em; text-transform: uppercase; }
 .page-intro { min-height: 285px; display: grid; grid-template-columns: 1fr 310px; gap: 60px; align-items: center; }
 .page-intro h1 { margin-bottom: 0; font-size: clamp(44px, 6vw, 82px); line-height: .96; }
@@ -185,11 +196,17 @@ td:last-child { color: var(--forest-2); font-weight: 600; }
   .theme-overview { grid-template-columns: 1fr; }
 }
 @media (max-width: 760px) {
-  .rail { position: relative; width: 100%; min-height: 78px; padding: 16px 20px; flex-direction: row; align-items: center; justify-content: space-between; }
-  .rail nav, .rail-note { display: none; }
+  .rail { position: sticky; top: 0; width: 100%; min-height: 0; padding: 16px 20px 0; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+  .rail nav { order: 3; display: flex; width: 100%; gap: 0; margin-top: 14px; overflow-x: auto; scrollbar-width: none; }
+  .rail nav::-webkit-scrollbar { display: none; }
+  .rail nav a { flex: 0 0 auto; padding: 10px 14px; border-bottom: 3px solid transparent; white-space: nowrap; font-size: 13px; }
+  .rail nav a span { width: 24px; }
+  .rail nav a:hover, .rail nav a.active { padding-left: 14px; border-bottom-color: var(--lime); }
+  .rail-note { display: none; }
   .source-link { text-align: right; }
   main { margin-left: 0; }
   .workspace { padding: 34px 18px 60px; }
+  .subpage-toolbar { grid-template-columns: 1fr; gap: 28px; padding-top: 4px; }
   .page-intro { min-height: 0; grid-template-columns: 1fr; gap: 35px; padding-bottom: 38px; }
   .page-intro h1 { font-size: 48px; }
   .territory-picker { margin-bottom: 0; }
