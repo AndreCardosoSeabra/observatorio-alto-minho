@@ -43,9 +43,8 @@ h1, h2 { font-family: "DM Serif Display", serif; font-weight: 400; letter-spacin
 
 .rail { position: fixed; inset: 0 auto 0 0; width: var(--rail); padding: 28px 24px; background: var(--forest); color: white; display: flex; flex-direction: column; z-index: 20; }
 .brand { color: inherit; text-decoration: none; display: flex; align-items: center; gap: 13px; }
-.brand-symbol { position: relative; display: block; width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.3); border-radius: 50%; }
-.brand-symbol i:first-child { position: absolute; width: 24px; height: 13px; border: 4px solid var(--lime); border-top: 0; border-radius: 0 0 20px 20px; left: 8px; top: 9px; transform: rotate(-12deg); }
-.brand-symbol i:last-child { position: absolute; width: 24px; height: 3px; border-radius: 3px; background: var(--river); left: 9px; bottom: 9px; }
+.brand-symbol { position: relative; display: block; flex: 0 0 auto; width: 46px; height: 46px; overflow: hidden; }
+.brand-symbol img { display: block; width: auto; max-width: none; height: 46px; }
 .brand b { display: block; font-family: "DM Serif Display", serif; font-size: 20px; font-weight: 400; line-height: 1; }
 .brand small { display: block; margin-top: 5px; color: #b7d0c7; font-size: 12px; }
 .rail nav { display: grid; gap: 4px; margin-top: 70px; }
@@ -71,6 +70,7 @@ body[data-page="comparar"] .compare-section,
 body[data-page="metodologia"] .method-section { min-height: 100vh; }
 body[data-page="metodologia"] .method-section { margin-bottom: 0; }
 .subpage-toolbar { display: grid; grid-template-columns: 1fr 310px; gap: 60px; align-items: end; padding: 18px 0 46px; border-bottom: 1px solid var(--line); }
+.compare-page-header { margin: 0 calc(clamp(24px, 5vw, 78px) * -1); padding: 52px clamp(24px, 5vw, 78px) 46px; background: var(--paper); }
 .subpage-toolbar h1 { margin-bottom: 0; font-size: clamp(42px, 5vw, 68px); line-height: 1; }
 .territory-picker.compact { align-self: auto; margin-bottom: 0; }
 .overline { margin-bottom: 12px; color: var(--forest-2); font-size: 12px; font-weight: 600; letter-spacing: .13em; text-transform: uppercase; }
@@ -207,6 +207,7 @@ td:last-child { color: var(--forest-2); font-weight: 600; }
   main { margin-left: 0; }
   .workspace { padding: 34px 18px 60px; }
   .subpage-toolbar { grid-template-columns: 1fr; gap: 28px; padding-top: 4px; }
+  .compare-page-header { margin: 0 -18px; padding: 34px 18px 32px; }
   .page-intro { min-height: 0; grid-template-columns: 1fr; gap: 35px; padding-bottom: 38px; }
   .page-intro h1 { font-size: 48px; }
   .territory-picker { margin-bottom: 0; }

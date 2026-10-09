@@ -14,13 +14,13 @@
 <body data-page="comparar">
   <header class="rail">
     <a class="brand" href="./index.html" aria-label="Observatório Alto Minho — início">
-      <span class="brand-symbol" aria-hidden="true"><i></i><i></i></span>
+      <span class="brand-symbol" aria-hidden="true"><img src="./cim-alto-minho.svg" alt=""></span>
       <span><b>Alto Minho</b><small>Observatório territorial</small></span>
     </a>
     <nav aria-label="Navegação principal">
       <a href="./index.html"><span>01</span>Retrato</a>
-      <a class="active" aria-current="page" href="./comparar.html"><span>02</span>Comparar</a>
-      <a href="./indicadores.html"><span>03</span>Indicadores</a>
+      <a href="./indicadores.html"><span>02</span>Indicadores</a>
+      <a class="active" aria-current="page" href="./comparar.html"><span>03</span>Comparar</a>
       <a href="./metodologia.html"><span>04</span>Metodologia</a>
     </nav>
     <div class="rail-note">
@@ -32,8 +32,19 @@
 
   <main id="top">
     <section class="workspace page-workspace">
+      <div class="subpage-toolbar compare-page-header">
+        <div>
+          <p class="overline">Benchmarking territorial</p>
+          <h1>Comparação municipal</h1>
+        </div>
+        <div class="territory-picker compact">
+          <label for="territory-select">Município em destaque</label>
+          <select id="territory-select" aria-label="Escolha o município em destaque"></select>
+          <p>Selecione um território para o destacar no gráfico</p>
+        </div>
+      </div>
       <section class="compare-section" id="comparar">
-        <div class="section-index">02</div>
+        <div class="section-index">03</div>
         <div class="compare-head">
           <div>
             <p class="overline">Benchmarking municipal</p>
