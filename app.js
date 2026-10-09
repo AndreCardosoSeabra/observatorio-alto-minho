@@ -99,14 +99,21 @@ function renderCatalog(query=""){
   const body=document.querySelector("#catalog-body"),empty=document.querySelector("#catalog-empty");if(!body||!empty)return;
   const normalized=query.trim().toLocaleLowerCase("pt-PT"), matches=catalog.filter(item=>`${item.name} ${item.area} ${item.year} ${item.source} ${item.dimension}`.toLocaleLowerCase("pt-PT").includes(normalized));
   body.innerHTML=matches.map(item=>`<tr class="catalog-row ${item.key===selectedIndicatorKey?'active':''}" tabindex="0" role="button" data-indicator-key="${item.key}" aria-label="Ver ${item.name}"><td>${item.name}</td><td>${item.area}</td><td>${item.year}</td><td>${item.source}</td></tr>`).join(""); empty.hidden=matches.length>0;
-  document.querySelectorAll(".catalog-row").forEach(row=>{const choose=()=>selectCatalogIndicator(row.dataset.indicatorKey);row.addEventListener("click",choose);row.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();choose();}});});
+  document.querySelectorAll(".catalog-row").forEach(row=>{const choose=scrollToDetail=>selectCatalogIndicator(row.dataset.indicatorKey,scrollToDetail);row.addEventListener("click",()=>choose(false));row.addEventListener("dblclick",()=>choose(true));row.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();choose(false);}});});
 }
 
 function renderCatalogDetail(){
   if(!document.querySelector("#indicator-detail"))return;
   const item=catalog.find(entry=>entry.key===selectedIndicatorKey)||catalog[0]; document.querySelector("#detail-name").textContent=item.name; document.querySelector("#detail-description").textContent=item.description; document.querySelector("#detail-territory").textContent=selectedTerritory; document.querySelector("#detail-value").textContent=formattedValue(item,item.values[selectedTerritory]); document.querySelector("#detail-area").textContent=item.area; document.querySelector("#detail-year").textContent=item.year; document.querySelector("#detail-dimension").textContent=item.dimension; document.querySelector("#detail-source").textContent=item.source; document.querySelector("#detail-source-link").href=item.sourceUrl; document.querySelector("#indicator-compare-button").disabled=false;
 }
-function selectCatalogIndicator(key){if(!catalog.some(item=>item.key===key))return;selectedIndicatorKey=key;localStorage.setItem("observatorio-indicator",key);renderCatalogDetail();renderCatalog(document.querySelector("#indicator-search")?.value||"");}
+function selectCatalogIndicator(key,scrollToDetail=false){
+  if(!catalog.some(item=>item.key===key))return;
+  selectedIndicatorKey=key;
+  localStorage.setItem("observatorio-indicator",key);
+  renderCatalogDetail();
+  document.querySelectorAll(".catalog-row").forEach(row=>row.classList.toggle("active",row.dataset.indicatorKey===key));
+  if(scrollToDetail)document.querySelector("#indicator-detail")?.scrollIntoView({behavior:"smooth",block:"start"});
+}
 function render(){const data=dataFor(selectedTerritory);renderKpis(data);renderTheme(data);renderComparison();renderCatalogDetail();}
 
 if(select)select.addEventListener("change",e=>setTerritory(e.target.value));
