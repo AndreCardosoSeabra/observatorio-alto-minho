@@ -2,6 +2,14 @@ name: Atualizar dados estatísticos
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/update-data.yml"
+      - "scripts/update-data.py"
+      - "scripts/download-pordata.mjs"
+      - "data/pordata-sources.json"
   schedule:
     - cron: "17 6 * * 1"
 
@@ -44,7 +52,30 @@ jobs:
         run: npm run download:pordata
 
       - name: Atualizar e validar os indicadores
-        run: python scripts/update-data.py
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            echo "Tentativa ${attempt} de 3"
+            if python scripts/update-data.py; then
+              exit 0
+            fi
+            if [ "${attempt}" -lt 3 ]; then
+              wait_seconds=$((attempt * 20))
+              echo "A fonte ou a rede falhou. Nova tentativa dentro de ${wait_seconds} segundos."
+              sleep "${wait_seconds}"
+            fi
+          done
+          echo "A atualização falhou após três tentativas."
+          exit 1
+
+      - name: Guardar diagnóstico da validação
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostico-atualizacao
+          path: data/update-report.json
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Publicar alterações
         run: |

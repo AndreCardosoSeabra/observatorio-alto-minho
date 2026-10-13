@@ -473,6 +473,8 @@ def main() -> None:
     pordata_count = update_pordata(values_by_name, report)
     ine_count = update_ine(values_by_name, report)
     pordata_count += update_salary_difference(values_by_name, report)
+    REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if pordata_count != expected_pordata:
         failures = [entry for entry in report if entry["source"] == "Pordata" and entry["status"] == "kept"]
         raise RuntimeError(f"Só {pordata_count} de {expected_pordata} indicadores Pordata passaram a validação. Falhas: {failures}")
@@ -481,7 +483,6 @@ def main() -> None:
     write_javascript_object(VALUES_PATH, "Valores atualizados automaticamente a partir do INE e da Pordata.", "indicatorValuesByName", values_by_name)
     update_catalog_links()
     write_powerbi_dataset(values_by_name)
-    REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Atualização concluída: {pordata_count} indicadores Pordata e {ine_count} indicadores INE verificados.")
 
 
