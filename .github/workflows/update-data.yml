@@ -46,7 +46,21 @@ jobs:
           python -m pip install -r requirements.txt
 
       - name: Confirmar ligação ao INE
-        run: python scripts/update-data.py --check-ine
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            echo "Tentativa INE ${attempt} de 3"
+            if python scripts/update-data.py --check-ine; then
+              exit 0
+            fi
+            if [ "${attempt}" -lt 3 ]; then
+              wait_seconds=$((attempt * 20))
+              echo "O INE não respondeu corretamente. Nova tentativa dentro de ${wait_seconds} segundos."
+              sleep "${wait_seconds}"
+            fi
+          done
+          echo "Não foi possível validar a ligação ao INE após três tentativas."
+          exit 1
 
       - name: Descarregar dados da Pordata
         run: npm run download:pordata
