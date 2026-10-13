@@ -153,10 +153,7 @@ def fetch_ine_via_gateway(url: str, attempts: int = 3) -> object:
     raise RuntimeError(f"Falha ao consultar o indicador INE {code} através do gateway: {last_error}")
 
 
-def fetch_json(url: str, attempts: int = 3) -> object:
-    if os.environ.get("GITHUB_ACTIONS") == "true" and "www.ine.pt/ine/json_indicador/" in url:
-        return fetch_ine_via_gateway(url, attempts)
-
+def fetch_json_direct(url: str, attempts: int = 3) -> object:
     curl = shutil.which("curl")
     if curl:
         last_error = None
@@ -204,6 +201,22 @@ def fetch_json(url: str, attempts: int = 3) -> object:
             last_error = error
             time.sleep(2**attempt)
     raise RuntimeError(f"Falha ao consultar {url}: {last_error}")
+
+
+def fetch_json(url: str, attempts: int = 3) -> object:
+    if os.environ.get("GITHUB_ACTIONS") == "true" and "www.ine.pt/ine/json_indicador/" in url:
+        direct_error = None
+        try:
+            return fetch_json_direct(url, 1)
+        except Exception as error:
+            direct_error = error
+        try:
+            return fetch_ine_via_gateway(url, attempts)
+        except Exception as gateway_error:
+            raise RuntimeError(
+                f"Falha na API oficial do INE ({direct_error}) e no gateway alternativo ({gateway_error})"
+            ) from gateway_error
+    return fetch_json_direct(url, attempts)
 
 
 def rows_for_latest_complete_year(item: dict, filters: dict[str, str]) -> tuple[str, list[dict]]:
