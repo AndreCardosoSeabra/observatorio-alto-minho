@@ -56,7 +56,7 @@ _PF = (0,)  # 1.ª coluna de cada ano = "Total" nos ficheiros "total e por sexo 
 _ENSINO = "Estabelecimentos nos ensinos pré-escolar, básico e secundário: por nível de ensino"
 _RSI = "Beneficiários do Rendimento Mínimo Garantido e Rendimento Social de Inserção da Segurança Social: total e por grupo etário"
 _ESTR = "População estrangeira com estatuto legal de residente: total e por sexo"
-_SEXO = "População residente (estimativas a 31 de dezembro): total e por sexo"
+_SEXO = "População residente: total e por sexo"
 _GANHO = "Ganho médio mensal dos trabalhadores por conta de outrem: total e por sexo"
 PORDATA_FIXED_POSITIONS.update({
     "Freguesias": _PF,
@@ -118,8 +118,8 @@ def read_javascript_object(path: Path, variable: str) -> dict:
 
 def write_javascript_object(path: Path, comment: str, variable: str, value: dict) -> None:
     """Escreve o dicionário de volta num .js (`// comentário` + `const variavel = {...};`) em UTF-8,
-    compacto e sem escapar acentos."""
-    payload = json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+    indentado em várias linhas e sem escapar acentos."""
+    payload = json.dumps(value, ensure_ascii=False, indent=2)
     path.write_bytes(f"// {comment}\nconst {variable} = {payload};\n".encode("utf-8"))
 
 
@@ -330,10 +330,9 @@ def merge_history(entry: dict, new_series: dict[str, dict]) -> int:
 
 
 def update_ine(values_by_name: dict, report: list[dict]) -> int:
-    """Atualiza os indicadores do INE (os de INE_DIRECT e a diferença salarial H/M) em `values_by_name`.
+    """Atualiza os indicadores do INE (os de INE_DIRECT) em `values_by_name`.
     Para cada um: grava o ano completo mais recente e o histórico dos anos anteriores. Se o INE só tiver um ano
-    mais antigo do que o já guardado, mantém o valor atual. A diferença H/M é calculada a partir dos ganhos de
-    homens e mulheres: (H − M) / H × 100. Regista o resultado em `report` e devolve quantos indicadores foram validados."""
+    mais antigo do que o já guardado, mantém o valor atual. Regista o resultado em `report` e devolve quantos indicadores foram validados."""
     updated = 0
     cache: dict[str, dict] = {}
     for name, config in INE_DIRECT.items():
@@ -358,35 +357,6 @@ def update_ine(values_by_name: dict, report: list[dict]) -> int:
         years_stored = merge_history(values_by_name[name], history)
         updated += 1
         report.append({"indicator": name, "source": "INE", "status": "updated" if changed else "checked", "year": year, "years_in_history": years_stored})
-
-    name = "Diferença salarial H/M (%)"
-    item = cache.get("0012649")
-    if item is None:
-        payload = fetch_json("https://www.ine.pt/ine/json_indicador/pindica.jsp?op=2&varcd=0012649&lang=PT")
-        item = payload[0]
-    year_h, men_rows = rows_for_latest_complete_year(item, {"dim_3": "TOT", "dim_4": "1"})
-    year_m, women_rows = rows_for_latest_complete_year(item, {"dim_3": "TOT", "dim_4": "2"})
-    if year_h != year_m:
-        raise ValueError("INE 0012649: os anos por sexo não coincidem")
-    men = {NORMALIZED_TERRITORIES[normalized(row["geodsg"])]: float(row["valor"]) for row in men_rows}
-    women = {NORMALIZED_TERRITORIES[normalized(row["geodsg"])]: float(row["valor"]) for row in women_rows}
-    gap = {territory: round((men[territory] - women[territory]) / men[territory] * 100, 4) for territory in TERRITORIES}
-    validate_values(gap, name)
-    if int(year_h) >= int(values_by_name[name]["year"]):
-        changed = values_by_name[name]["values"] != gap or values_by_name[name]["year"] != year_h
-        values_by_name[name]["values"] = gap
-        values_by_name[name]["year"] = year_h
-        men_series = ine_series(item, {"dim_3": "TOT", "dim_4": "1"})
-        women_series = ine_series(item, {"dim_3": "TOT", "dim_4": "2"})
-        gap_history = {
-            y: {t: round((men_series[y][t] - women_series[y][t]) / men_series[y][t] * 100, 4) for t in TERRITORIES}
-            for y in men_series
-            if y in women_series and all(float(men_series[y][t]) != 0 for t in TERRITORIES)
-        }
-        gap_history[year_h] = gap
-        years_stored = merge_history(values_by_name[name], gap_history)
-        updated += 1
-        report.append({"indicator": name, "source": "INE", "status": "updated" if changed else "checked", "year": year_h, "years_in_history": years_stored})
     return updated
 
 
@@ -586,9 +556,13 @@ def update_pordata(values_by_name: dict, report: list[dict]) -> int:
 BREAKDOWNS = (
     ("População estrangeira com estatuto legal de residente: total e por algumas nacionalidades", "101.xlsx", "nacionalidade", {}),
     ("População estrangeira com estatuto legal de residente: total e por sexo", "99.xlsx", "sexo", {"Masculino": "Homens", "Feminino": "Mulheres"}),
+    ("População residente: total e por sexo", "357.xlsx", "sexo", {"Masculino": "Homens", "Feminino": "Mulheres", "Homens": "Homens", "Mulheres": "Mulheres"}),
     ("Obitos por algumas causas de morte (%)", "373.xlsx", "causa de morte", {}),
     ("Estabelecimentos nos ensinos pré-escolar, básico e secundário: por nível de ensino", "213.xlsx", "nível de ensino", {}),
     ("Ganho médio mensal dos trabalhadores por conta de outrem: total e por sexo", "282.xlsx", "sexo", {"Masculino": "Homens", "Feminino": "Mulheres"}),
+    ("Profissionais de saúde: médicos, dentistas, enfermeiros e farmacêuticos", "442.xlsx", "profissão", {}),
+    ("Desempregados inscritos nos centros de emprego e de formação profissional (média anual): total e por grupo etário", "221.xlsx", "grupo etário", {}),
+    ("Beneficiários do Rendimento Mínimo Garantido e Rendimento Social de Inserção da Segurança Social: total e por sexo", "513.xlsx", "sexo", {"Masculino": "Homens", "Feminino": "Mulheres", "Homens": "Homens", "Mulheres": "Mulheres"}),
 )
 
 # Indicadores em que o valor "total" grande não aparece no detalhe (só a tabela por categoria).
@@ -713,8 +687,6 @@ def update_catalog_links() -> None:
         if item["name"] in INE_DIRECT:
             code = INE_DIRECT[item["name"]]["code"]
             item["url"] = f"https://www.ine.pt/xportal/xmain?xpid=INE&xpgid=ine_indicadores&indOcorrCod={code}&contexto=bd&selTab=tab2"
-        if item["name"] == "Diferença salarial H/M (%)":
-            item["url"] = "https://www.ine.pt/xportal/xmain?xpid=INE&xpgid=ine_indicadores&indOcorrCod=0012649&contexto=bd&selTab=tab2"
         if item["name"] == "Pop. Estrangeira c/ estatuto residente":
             item["source"] = "Pordata"
             item["url"] = sources["População estrangeira com estatuto legal de residente: total e por algumas nacionalidades"]

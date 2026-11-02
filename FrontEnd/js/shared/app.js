@@ -24,10 +24,11 @@ const mapLabels = {
 //   area        -> categoria (filtros da tabela): uma de categoryList
 //   sub         -> subcategoria (só Demografia): uma de demografiaSubs
 //   tab         -> separador da página inicial: Demografia, Habitação, Emprego, Educação, Saúde, Coesão social ou Outros
+
 const catalogOverrides = {
   "Superfície Km2": {
     name:"Superfície Km2",
-    description:"Superfície. Indicador integrado na matriz intermunicipal.",
+    description:"Superfície das unidades territoriais por Localização geográfica.",
     dimension:"Superfície do território",
     area:"Contexto territorial",
     tab:"Outros"
@@ -64,14 +65,6 @@ const catalogOverrides = {
     sub:"População",
     tab:"Demografia"
   },
-  "População residente por freguesias censos 2021": {
-    name:"População com concelhos e freguesias",
-    description:"Dinâmica populacional · Estrutura da População. Indicador integrado na matriz intermunicipal.",
-    dimension:"Total municipal",
-    area:"Demografia",
-    sub:"População",
-    tab:"Demografia"
-  },
   "Índice de dependência idosos": {
     name:"Dependência idosos",
     description:"Onde há mais e menos idosos por 100 pessoas em idade ativa.",
@@ -98,24 +91,8 @@ const catalogOverrides = {
   },
   "Nº de índividuos em idade ativa por idoso": {
     name:"Número de indivíduos em idade ativa por idosos",
-    description:"Dinâmica populacional · Estrutura da População. Indicador integrado na matriz intermunicipal.",
+    description:"Número de indivíduos em idade ativa por idosos.",
     dimension:"Pessoas em idade ativa por pessoa idosa",
-    area:"Demografia",
-    sub:"População",
-    tab:"Demografia"
-  },
-  "População residente do sexo feminino: total e por grupo etário": {
-    name:"População residente do sexo feminino: total e por grupo etário",
-    description:"Dinâmica populacional · Estrutura da População. Indicador integrado na matriz intermunicipal.",
-    dimension:"Mulheres — total",
-    area:"Demografia",
-    sub:"População",
-    tab:"Demografia"
-  },
-  "População residente do sexo masculino: total e por grupo etário": {
-    name:"População residente do sexo masculino: total e por grupo etário",
-    description:"Dinâmica populacional · Estrutura da População. Indicador integrado na matriz intermunicipal.",
-    dimension:"Homens — total",
     area:"Demografia",
     sub:"População",
     tab:"Demografia"
@@ -129,7 +106,7 @@ const catalogOverrides = {
   },
   "Obitos por residentes total e por grupo etário": {
     name:"Óbitos de residentes",
-    description:"Dinâmica populacional · Estrutura da População. Indicador integrado na matriz intermunicipal.",
+    description:"Onde há mais e menos mortes.",
     dimension:"Total",
     area:"Demografia",
     sub:"Esperança de Vida",
@@ -189,16 +166,9 @@ const catalogOverrides = {
     tab:"Emprego"
   },
   "Desempregados inscritos nos centros de emprego e de formação profissional (média anual): total e por grupo etário": {
-    name:"Desempregados inscritos nos centros de emprego e de formação profissional (média anual): total e por grupo etário",
-    description:"Acesso · Mercado. Indicador integrado na matriz intermunicipal.",
-    dimension:"Média anual — total",
-    area:"Emprego e Remunerações",
-    tab:"Emprego"
-  },
-  "Desempregados inscritos nos centros de emprego e de formação profissional": {
     name:"Desempregados inscritos nos centros de emprego e de formação profissional",
-    description:"Acesso · Mercado. Indicador integrado na matriz intermunicipal.",
-    dimension:"Inscritos em dezembro",
+    description:"Onde há mais e menos pessoas registadas no IEFP à procura de emprego, por idades.",
+    dimension:"Média anual",
     area:"Emprego e Remunerações",
     tab:"Emprego"
   },
@@ -226,69 +196,69 @@ const catalogOverrides = {
   "Estabelecimentos nos ensinos pré-escolar, básico e secundário: por nível de ensino": {
     name:"Estabelecimentos de ensino",
     description:"Onde há mais e menos escolas do pré-escolar, básico ou secundário.",
-    dimension:"Soma dos 5 níveis de ensino (cada estabelecimento conta uma vez por cada ensino que ministra)",
+    dimension:"Total e por nível escolar",
     area:"Educação",
     tab:"Educação"
   },
   "Taxa de analfabetismo": {
     name:"Taxa de analfabetismo",
     description:"Percentagem da população residente que não sabe ler nem escrever.",
-    dimension:"Ambos os sexos",
+    dimension:"Percentagem",
     area:"Educação",
     tab:"Habitação"
   },
   "Habitantes por médico e farmacêutico": {
     name:"Habitantes por médico",
-    description:"Abandono · Sucesso. Indicador integrado na matriz intermunicipal.",
+    description:"Número médio de habitantes por médico.",
     dimension:"Habitantes por médico",
     area:"Saúde",
     tab:"Saúde"
   },
   "Habitantes por farmácia e posto farmacêutico móvel": {
     name:"Habitantes por farmácia",
-    description:"Abandono · Sucesso. Indicador integrado na matriz intermunicipal.",
+    description:"Onde há mais e menos pessoas, em média, por estabelecimento farmacêutico",
     dimension:"Habitantes por farmácia/posto",
     area:"Saúde",
     tab:"Saúde"
   },
   "Profissionais de saúde: médicos, dentistas, enfermeiros e farmacêuticos": {
     name:"Profissionais saúde",
-    description:"Acesso · Cuidados. Indicador integrado na matriz intermunicipal.",
+    description:"Onde há mais e menos médicos, dentistas, enfermeiros ou farmacêuticos.",
     dimension:"Total das quatro profissões",
     area:"Saúde",
     tab:"Saúde"
   },
   "Beneficiários do Rendimento Mínimo Garantido e Rendimento Social de Inserção da Segurança Social: total e por sexo": {
-    name:"Beneficiários do Rendimento Mínimo Garantido e Rendimento Social de Inserção da Segurança Social: total e por sexo",
-    description:"Acesso · Cuidados. Indicador integrado na matriz intermunicipal.",
-    dimension:"Ambos os sexos — total",
+    name:"Beneficiários do Rendimento Mínimo Garantido e Rendimento Social de Inserção da Segurança Social",
+    description:"Onde há mais e menos homens ou mulheres a receber o apoio da Segurança Social para famílias mais carenciadas",
+    dimension:"Total e sexo",
     area:"Proteção Social",
     tab:"Coesão social"
   },
   "Pensões da Segurança Social: total, de sobrevivência, de invalidez e de velhice": {
     name:"Pensões SS",
-    description:"Acesso · Cuidados. Indicador integrado na matriz intermunicipal.",
+    description:"Onde paga a Segurança Social mais e menos pensões de velhice, invalidez ou sobrevivência.",
     dimension:"Total",
     area:"Proteção Social",
     tab:"Coesão social"
   },
   "Subsídio por assistência à 3ª pessoa da Segurança Social": {
     name:"Subsídios 3ª pessoa",
-    description:"Acesso · Cuidados. Indicador integrado na matriz intermunicipal.",
+    description:"Onde há mais e menos pessoas a receber o apoio da Segurança Social às famílias com crianças e adultos deficientes que exigem acompanhamento permanente.  ",
     dimension:"Total",
     area:"Proteção Social",
     tab:"Coesão social"
   },
   "Pensões: total, da Segurança Social e da Caixa Geral de Aposentações": {
     name:"Pensões totais",
-    description:"Acesso · Cuidados. Indicador integrado na matriz intermunicipal.",
+    description:"Onde pagam a Segurança Social e a CGA mais e menos pensões, como as de velhice, aposentação, reforma, invalidez ou sobrevivência.",
     dimension:"Total",
     area:"Proteção Social",
     tab:"Coesão social"
   },
   "Beneficiários do subsídio de desemprego da Segurança Social no total de beneficiários ativos (%)": {
     name:"Subsídio desempregado",
-    description:"Acesso · Cuidados. Indicador integrado na matriz intermunicipal.",
+    description:"Onde há mais e menos homens ou mulheres desempregados a receber apoio da Segurança Social, por 100 contribuintes.",
     dimension:"Total",
     area:"Proteção Social",
     tab:"Coesão social"
@@ -309,7 +279,7 @@ const catalogOverrides = {
   },
   "Caixa Geral de Aposentações: reformados/aposentados e pensionistas": {
     name:"Reformados CGA",
-    description:"Acesso · Cuidados. Indicador integrado na matriz intermunicipal.",
+    description:"Onde há mais e menos pessoas a receber pensões de reforma,de aposentação ou outras da CGA.",
     dimension:"Total",
     area:"Proteção Social",
     tab:"Coesão social"
@@ -322,19 +292,13 @@ const catalogOverrides = {
     sub:"Migração",
     tab:"Coesão social"
   },
-  "Diferença salarial H/M (%)": {
-    name:"Diferença salarial H/M (%)",
-    description:"Igualdade de género · Igualdade de género. Indicador integrado na matriz intermunicipal.",
-    dimension:"Diferença do ganho médio mensal face aos homens",
-    area:"Emprego e Remunerações",
-    tab:"Emprego"
-  },
   "% famílias monoparentais": {
     name:"Núcleos familiares monoparentais",
-    description:"Número de núcleos familiares monoparentais registados nos Censos 2021.",
+    description:"Número de núcleos familiares monoparentais registados.",
     dimension:"Núcleos familiares monoparentais (N.º)",
-    area:"Condições de vida",
-    tab:"Outros"
+    area:"Demografia",   
+    sub:"População",    
+    tab:"Demografia"
   },
   "Proporção de pop. residente em movimentos pendulares": {
     name:"Movimentos pendulares",
@@ -344,8 +308,8 @@ const catalogOverrides = {
     tab:"Emprego"
   },
   "Despesa das Câmaras Municipais em cultura e desporto: total, correntes e de capital": {
-    name:"Despesa das Câmaras Municipais em cultura e desporto: total, correntes e de capital",
-    description:"Transportes · Movimentos. Indicador integrado na matriz intermunicipal.",
+    name:"Despesa das Câmaras Municipais em cultura e desporto",
+    description:"Que autarquias gastam mais e menos em despesas correntes ou em investimento e noutras despesas de capital na área da cultura e desporto",
     dimension:"Despesa total",
     area:"Cultura",
     tab:"Outros"
@@ -359,7 +323,7 @@ const catalogOverrides = {
   },
   "Crimes registados pelas polícias por mil habitantes": {
     name:"Crimes registados",
-    description:"Transportes · Movimentos. Indicador integrado na matriz intermunicipal.",
+    description:"Onde há mais e menos crimes por 1.000 residentes, segundo as polícias. ",
     dimension:"Crimes por mil habitantes",
     area:"Segurança",
     tab:"Outros"
@@ -367,7 +331,7 @@ const catalogOverrides = {
   "Freguesias": {
     name:"Número de Freguesias",
     description:"Onde há mais e menos freguesias",
-    dimension:"Número de freguesias",
+    dimension:"Total",
     area:"Contexto territorial",
     tab:"Outros"
   },
@@ -379,10 +343,10 @@ const catalogOverrides = {
     sub:"População",
     tab:"Demografia"
   },
-  "População residente (estimativas a 31 de dezembro): total e por sexo": {
+  "População residente: total e por sexo": {
     name:"População residente por sexo",
-    description:"Dinâmica populacional · Distribuição da população. Indicador integrado na matriz intermunicipal.",
-    dimension:"Total (estimativa a 31 de dezembro)",
+    description:"Onde há mais e menos homens ou mulheres.",
+    dimension:"Total e por sexo",
     area:"Demografia",
     sub:"População",
     tab:"Demografia"
@@ -390,14 +354,14 @@ const catalogOverrides = {
   "Ganho médio mensal dos trabalhadores por conta de outrem: total e por sexo": {
     name:"Ganho médio por sexo",
     description:"Onde é maior e menor o ordenado médio, por mês, com horas extra, subsídios ou prémios, dos homens ou mulheres aprendizes, quadros médios e superiores ou outros empregados.",
-    dimension:"Ganho médio mensal — total",
+    dimension:"Total",
     area:"Emprego e Remunerações",
     tab:"Emprego"
   },
   "Beneficiários do Rendimento Mínimo Garantido e Rendimento Social de Inserção da Segurança Social: total e por grupo etário": {
     name:"RSI: grupo etário",
-    description:"Acesso · Cuidados. Indicador integrado na matriz intermunicipal.",
-    dimension:"Total (todos os grupos etários)",
+    description:"Onde há mais e menos pessoas, por idades, a receber o apoio da Segurança Social para famílias mais carenciadas.",
+    dimension:"Total ",
     area:"Proteção Social",
     tab:"Coesão social"
   },
