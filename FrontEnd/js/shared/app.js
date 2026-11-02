@@ -30,7 +30,7 @@ const catalogOverrides = {
     name:"Superfície Km2",
     description:"Superfície das unidades territoriais por Localização geográfica.",
     dimension:"Superfície do território",
-    area:"Contexto territorial",
+    area:"Demografia",
     tab:"Outros"
   },
   "Índice de envelhecimento": {
@@ -43,7 +43,7 @@ const catalogOverrides = {
   },
   "Saldo Natural": {
     name:"Saldo Natural",
-    description:"Estrutura etária · Envelhecimento/Natalidade. Indicador integrado na matriz intermunicipal.",
+    description:"Onde há maior e menor diferença entre o número de nascimentos e de mortes.",
     dimension:"Saldo natural anual",
     area:"Demografia",
     sub:"Natalidade",
@@ -148,35 +148,28 @@ const catalogOverrides = {
     name:"Valor de venda de habitação",
     description:"Valor mediano de venda por metro quadrado no mercado habitacional.",
     dimension:"Valor mediano de venda",
-    area:"Condições de vida",
+    area:"Habitação",
     tab:"Habitação"
   },
   "Desempregados inscritos nos centros de emprego e de formação profissional no total da população residente com 15 a 64 anos (%)": {
     name:"Percentagem de desemprego",
     description:"Onde maior e menor percentagem de pessoas entre os 15 e os 64 anos registadas no IEFP à procura de emprego.",
     dimension:"Total",
-    area:"Emprego e Remunerações",
-    tab:"Emprego"
-  },
-  "Diferença entre o salário mínimo nacional e a remuneração base média mensal dos trabalhadores por conta de outrem": {
-    name:"Diferença entre o salário mínimo nacional e a remuneração base média mensal dos trabalhadores por conta de outrem",
-    description:"Acesso · Mercado. Indicador integrado na matriz intermunicipal.",
-    dimension:"Remuneração média menos SMN de 2024 (€820)",
-    area:"Emprego e Remunerações",
+    area:"Habitação",
     tab:"Emprego"
   },
   "Desempregados inscritos nos centros de emprego e de formação profissional (média anual): total e por grupo etário": {
     name:"Desempregados inscritos nos centros de emprego e de formação profissional",
     description:"Onde há mais e menos pessoas registadas no IEFP à procura de emprego, por idades.",
     dimension:"Média anual",
-    area:"Emprego e Remunerações",
+    area:"Habitação",
     tab:"Emprego"
   },
   "Rendimento médio": {
     name:"Ganho médio mensal",
     description:"Ganho médio mensal dos trabalhadores por conta de outrem.",
     dimension:"Ganho médio mensal",
-    area:"Emprego e Remunerações",
+    area:"Habitação",
     tab:"Emprego"
   },
   "Taxa de retenção e desistência no ensino básico: total e por ano de escolaridade": {
@@ -232,56 +225,56 @@ const catalogOverrides = {
     name:"Beneficiários do Rendimento Mínimo Garantido e Rendimento Social de Inserção da Segurança Social",
     description:"Onde há mais e menos homens ou mulheres a receber o apoio da Segurança Social para famílias mais carenciadas",
     dimension:"Total e sexo",
-    area:"Proteção Social",
+    area:"Social",
     tab:"Coesão social"
   },
   "Pensões da Segurança Social: total, de sobrevivência, de invalidez e de velhice": {
     name:"Pensões SS",
     description:"Onde paga a Segurança Social mais e menos pensões de velhice, invalidez ou sobrevivência.",
     dimension:"Total",
-    area:"Proteção Social",
+    area:"Social",
     tab:"Coesão social"
   },
   "Subsídio por assistência à 3ª pessoa da Segurança Social": {
     name:"Subsídios 3ª pessoa",
     description:"Onde há mais e menos pessoas a receber o apoio da Segurança Social às famílias com crianças e adultos deficientes que exigem acompanhamento permanente.  ",
     dimension:"Total",
-    area:"Proteção Social",
+    area:"Social",
     tab:"Coesão social"
   },
   "Pensões: total, da Segurança Social e da Caixa Geral de Aposentações": {
     name:"Pensões totais",
     description:"Onde pagam a Segurança Social e a CGA mais e menos pensões, como as de velhice, aposentação, reforma, invalidez ou sobrevivência.",
     dimension:"Total",
-    area:"Proteção Social",
+    area:"Social",
     tab:"Coesão social"
   },
   "Beneficiários do subsídio de desemprego da Segurança Social no total de beneficiários ativos (%)": {
     name:"Subsídio desempregado",
     description:"Onde há mais e menos homens ou mulheres desempregados a receber apoio da Segurança Social, por 100 contribuintes.",
     dimension:"Total",
-    area:"Proteção Social",
+    area:"Social",
     tab:"Coesão social"
   },
   "Beneficiários do Rendimento Mínimo Garantido e Rendimento Social de Inserção da Segurança Social no total da população residente com 15 e mais anos (%)": {
     name:"RSI",
     description:"Onde há mais e menos pessoas a receber o apoio da Segurança Social para famílias mais carenciadas, por 100 residentes.",
     dimension:"Total",
-    area:"Proteção Social",
+    area:"Social",
     tab:"Coesão social"
   },
   "Abono de família para crianças e jovens da Segurança Social": {
     name:"Abono de família",
     description:"Onde há mais e menos famílias, crianças e jovens a receber o apoio da Segurança Social para sustento e educação dos filhos.",
     dimension:"Total",
-    area:"Proteção Social",
+    area:"Social",
     tab:"Coesão social"
   },
   "Caixa Geral de Aposentações: reformados/aposentados e pensionistas": {
     name:"Reformados CGA",
     description:"Onde há mais e menos pessoas a receber pensões de reforma,de aposentação ou outras da CGA.",
     dimension:"Total",
-    area:"Proteção Social",
+    area:"Social",
     tab:"Coesão social"
   },
   "Pop. Estrangeira c/ estatuto residente": {
@@ -296,43 +289,43 @@ const catalogOverrides = {
     name:"Núcleos familiares monoparentais",
     description:"Número de núcleos familiares monoparentais registados.",
     dimension:"Núcleos familiares monoparentais (N.º)",
-    area:"Demografia",   
-    sub:"População",    
+    area:"Social",
+    sub:"",
     tab:"Demografia"
   },
   "Proporção de pop. residente em movimentos pendulares": {
     name:"Movimentos pendulares",
     description:"Proporção da população residente que sai da unidade territorial.",
     dimension:"População em movimentos pendulares",
-    area:"Mobilidade",
+    area:"Território",
     tab:"Emprego"
   },
   "Despesa das Câmaras Municipais em cultura e desporto: total, correntes e de capital": {
     name:"Despesa das Câmaras Municipais em cultura e desporto",
     description:"Que autarquias gastam mais e menos em despesas correntes ou em investimento e noutras despesas de capital na área da cultura e desporto",
     dimension:"Despesa total",
-    area:"Cultura",
+    area:"Território",
     tab:"Outros"
   },
   "Poder de compra per capita": {
     name:"Poder de compra",
     description:"Onde há, em média, por pessoa, maior e menor bem estar material?",
     dimension:"Portugal = 100",
-    area:"Condições de vida",
+    area:"Habitação",
     tab:"Outros"
   },
   "Crimes registados pelas polícias por mil habitantes": {
     name:"Crimes registados",
     description:"Onde há mais e menos crimes por 1.000 residentes, segundo as polícias. ",
     dimension:"Crimes por mil habitantes",
-    area:"Segurança",
+    area:"Território",
     tab:"Outros"
   },
   "Freguesias": {
     name:"Número de Freguesias",
     description:"Onde há mais e menos freguesias",
     dimension:"Total",
-    area:"Contexto territorial",
+    area:"Demografia",
     tab:"Outros"
   },
   "Índice de dependência total": {
@@ -355,14 +348,14 @@ const catalogOverrides = {
     name:"Ganho médio por sexo",
     description:"Onde é maior e menor o ordenado médio, por mês, com horas extra, subsídios ou prémios, dos homens ou mulheres aprendizes, quadros médios e superiores ou outros empregados.",
     dimension:"Total",
-    area:"Emprego e Remunerações",
+    area:"Habitação",
     tab:"Emprego"
   },
   "Beneficiários do Rendimento Mínimo Garantido e Rendimento Social de Inserção da Segurança Social: total e por grupo etário": {
     name:"RSI: grupo etário",
     description:"Onde há mais e menos pessoas, por idades, a receber o apoio da Segurança Social para famílias mais carenciadas.",
     dimension:"Total ",
-    area:"Proteção Social",
+    area:"Social",
     tab:"Coesão social"
   },
   "População estrangeira com estatuto legal de residente: total e por sexo": {
@@ -411,11 +404,11 @@ const tabOf = item => areaByDomain[item.domain] || "Outros"; // valor por defeit
 // ===== 2b. CATEGORIAS DA PÁGINA INDICADORES =====
 // Botões de filtro da tabela. Cada indicador tem uma categoria (e a Demografia ainda uma subcategoria).
 // Por defeito segue o domínio do catálogo; as exceções estão no catalogOverrides (campo area).
-const categoryList = ["Condições de vida","Contexto territorial","Cultura","Demografia","Educação","Emprego e Remunerações","Mobilidade","Proteção Social","Saúde","Segurança"];
+const categoryList = ["Demografia","Social","Habitação","Saúde","Educação","Território"];
 const demografiaSubs = ["População","Natalidade","Migração","Esperança de Vida"];
-const categoryByDomain = { "Contexto Geográfico":"Contexto territorial", "Demografia":"Demografia", "Saúde":"Saúde", "Proteção Social":"Proteção Social",
-  "Mobilidade":"Mobilidade", "Cultura":"Cultura", "Segurança":"Segurança", "Condições de vida":"Condições de vida", "Família":"Condições de vida", "Habitação":"Condições de vida" };
-const categoryOf = item => categoryByDomain[item.domain] || "Contexto territorial"; // valor por defeito
+const categoryByDomain = { "Contexto Geográfico":"Demografia", "Demografia":"Demografia", "Saúde":"Saúde", "Proteção Social":"Social", "Família":"Social",
+  "Habitação":"Habitação", "Condições de vida":"Habitação", "Mobilidade":"Território", "Cultura":"Território", "Segurança":"Território" };
+const categoryOf = item => categoryByDomain[item.domain] || "Território"; // valor por defeito
 const subOf = item => categoryOf(item) === "Demografia" ? "População" : ""; // valor por defeito
 
 // ===== 3. CATÁLOGO FINAL =====
@@ -528,6 +521,8 @@ const yearColors=["#b7d3ee","#bfe0c7","#f6dd94","#ef9a93"]; // do ano mais antig
 // Passo "redondo" (1, 2, 5 × 10ⁿ) para as linhas de referência do eixo.
 const niceStep=range=>{const raw=range/4,power=10**Math.floor(Math.log10(raw)),n=raw/power;return(n<=1?1:n<=2?2:n<=5?5:10)*power;};
 
+const lineColors=["#2f6fb0","#e07a3f","#3a9d6b","#b04a8f","#c9a227","#6b5bd2","#d1463f","#2aa5b5","#7a8b2e","#8a6a4f"];
+const hiddenLines=new Set();
 function renderYearComparison(){
   const chart=document.querySelector("#year-chart"); if(!compareSelect||!chart)return;
   const item=catalog.find(entry=>entry.key===compareSelect.value)||catalog[0];
@@ -535,41 +530,60 @@ function renderYearComparison(){
 
   // Junta o histórico ao ano mais recente; fica só com os anos que têm valores.
   const series={...item.history,[item.year]:item.values};
-  const years=Object.keys(series).filter(year=>municipalities.some(name=>series[year]?.[name]!=null)).sort((a,b)=>Number(a)-Number(b));
+  const years=Object.keys(series).filter(year=>municipalities.some(name=>series[year]?.[name]!=null&&series[year][name]!==0)).sort((a,b)=>Number(a)-Number(b));
   if(years.length<2){chart.innerHTML=`<p class="history-empty">Este indicador só tem dados de um ano${years[0]?` (${years[0]})`:""}, por isso não há comparação entre anos.</p>`;return;}
 
-  // Cor de cada ano: o mais recente tem sempre a cor escura; os anteriores usam as cores claras, pela ordem.
-  const colorOf=index=>index===years.length-1?yearColors[3]:yearColors[Math.min(index,2)];
+  // Escalas: eixo X pelos anos, eixo Y só com os municípios visíveis.
+  const W=760,H=360,left=64,right=24,top=20,bottom=40;
+  const visible=municipalities.filter(name=>!hiddenLines.has(name));
+  const all=visible.flatMap(name=>years.map(year=>series[year]?.[name])).filter(value=>value!=null);
+  const lo=all.length?Math.min(...all):0, hi=all.length?Math.max(...all):1;
+  const step=niceStep(hi-lo||Math.abs(hi)||1);
+  const min=Math.floor(lo/step)*step, max=Math.ceil(hi/step)*step||step;
+  const y=value=>top+(max-value)*(H-top-bottom)/((max-min)||1);
+  const x=year=>left+years.indexOf(year)*(W-left-right)/((years.length-1)||1);
 
-  // Escalas do gráfico (o zero entra sempre, para as barras partirem da base).
-  const W=760,H=360,left=64,right=20,top=20,bottom=56;
-  const all=municipalities.flatMap(name=>years.map(year=>series[year]?.[name])).filter(value=>value!=null);
-  const step=niceStep(Math.max(...all,0)-Math.min(...all,0)||1);
-  const min=Math.floor(Math.min(...all,0)/step)*step, max=Math.ceil(Math.max(...all,0)/step)*step;
-  const y=value=>top+(max-value)*(H-top-bottom)/(max-min);
-
-  // Linhas horizontais de referência com o valor do eixo.
   const ticks=[];for(let value=min;value<=max+step/2;value+=step)ticks.push(value);
   const grid=ticks.map(value=>`<line class="grid" x1="${left}" x2="${W-right}" y1="${y(value)}" y2="${y(value)}"/><text class="axis" x="${left-8}" y="${y(value)+4}" text-anchor="end">${format(Number(value.toFixed(6)))}</text>`).join("");
+  const every=Math.max(1,Math.ceil(years.length/18));
+  const xlabels=years.map((year,i)=>(i%every===0&&years.length-1-i>=Math.ceil(every/2)||i===years.length-1)?`<text class="axis" x="${x(year)}" y="${H-bottom+20}" text-anchor="middle">${year}</text>`:"").join("");
 
-  // Um grupo de barras por município (uma barra por ano) e o nome por baixo, em duas linhas se for comprido.
-  const groupWidth=(W-left-right)/municipalities.length, barWidth=Math.min(26,groupWidth*0.8/years.length);
-  const groups=municipalities.map((name,g)=>{
-    const start=left+g*groupWidth+(groupWidth-barWidth*years.length)/2;
-    const bars=years.map((year,i)=>{
-      const value=series[year]?.[name]; if(value==null)return "";
-      return `<rect x="${start+i*barWidth}" y="${Math.min(y(value),y(0))}" width="${barWidth-2}" height="${Math.abs(y(value)-y(0))}" fill="${colorOf(i)}"><title>${name}, ${year}: ${formattedValue(item,value)}</title></rect>`;}).join("");
-    const label=(mapLabels[name]||[name]).map((line,i)=>`<tspan x="${left+(g+0.5)*groupWidth}" dy="${i?12:0}">${line}</tspan>`).join("");
-    return `<g class="year-group ${name===selectedTerritory?"selected":""}">${bars}<text class="axis" x="${left+(g+0.5)*groupWidth}" y="${H-bottom+18}" text-anchor="middle">${label}</text></g>`;}).join("");
+  // Uma linha por município (quebra onde faltam dados); o selecionado fica mais grosso.
+  const hasSel=municipalities.includes(selectedTerritory);
+  const lines=municipalities.map((name,i)=>{
+    if(hiddenLines.has(name))return "";
+    const color=lineColors[i%lineColors.length], isSel=name===selectedTerritory;
+    let solid="",dashed="",prev=null;
+    years.forEach(year=>{const v=series[year]?.[name];if(v==null)return;const pt=`${x(year).toFixed(1)} ${y(v).toFixed(1)}`;
+      if(prev){const seg=`M${prev.pt} L${pt} `;if(Number(year)-prev.year>1)dashed+=seg;else solid+=seg;}
+      prev={pt,year:Number(year)};});
+    const dots=years.length>(isSel?30:12)?"":years.map(year=>{const v=series[year]?.[name];return v==null?"":`<circle cx="${x(year)}" cy="${y(v)}" r="${isSel?4.5:3}" fill="${color}"/>`;}).join("");
+    return `<g class="line-group ${isSel?"selected":""} ${hasSel&&!isSel?"dim":""}"><path d="${solid}" fill="none" stroke="${color}" stroke-width="${isSel?4:2}" stroke-linejoin="round" stroke-linecap="round"/><path d="${dashed}" fill="none" stroke="${color}" stroke-width="${isSel?4:2}" stroke-dasharray="2 5" stroke-linecap="round"/>${dots}</g>`;}).join("");
 
-  // Legenda dos anos e nota com o território destacado (escolhido no menu lateral).
-  const legend=years.map((year,i)=>`<span><i style="background:${colorOf(i)}"></i>${year}</span>`).join("");
-  const note=municipalities.includes(selectedTerritory)
-    ? `Destacado: <strong>${selectedTerritory}</strong> · passe o rato numa barra para ver o valor.`
-    : `Escolha um município no menu lateral para o destacar · passe o rato numa barra para ver o valor.`;
+  // Zonas invisíveis por ano, para o tooltip com todos os municípios nesse ano.
+  const bandW=(W-left-right)/Math.max(years.length-1,1);
+  const bands=years.map(year=>`<rect class="year-band" data-year="${year}" x="${x(year)-bandW/2}" y="${top}" width="${bandW}" height="${H-top-bottom}" fill="transparent"/>`).join("");
 
-  chart.setAttribute("aria-label",`Comparação de ${item.name}, ${years[0]} a ${years[years.length-1]}`);
-  chart.innerHTML=`<div class="year-legend">${legend}</div><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Comparação de ${item.name} entre ${years.join(", ")}">${grid}<line class="zero" x1="${left}" x2="${W-right}" y1="${y(0)}" y2="${y(0)}"/>${groups}</svg><p class="history-note">${note}</p>`;
+  // Legenda clicável: liga/desliga cada município.
+  const legend=municipalities.map((name,i)=>`<button type="button" class="line-toggle ${hiddenLines.has(name)?"off":""}" data-line="${name}"><i style="background:${lineColors[i%lineColors.length]}"></i>${name}</button>`).join("");
+  const note=hasSel?`Destacado: <strong>${selectedTerritory}</strong> · clique num município da legenda para o mostrar/esconder · passe o rato num ano para ver os valores.`:`Escolha um município no menu lateral para o destacar · clique na legenda para mostrar/esconder · passe o rato num ano para ver os valores.`;
+
+  chart.setAttribute("aria-label",`Evolução de ${item.name}, ${years[0]} a ${years[years.length-1]}`);
+  chart.style.position="relative";
+  chart.innerHTML=`<div class="line-legend">${legend}</div><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Evolução de ${item.name} entre ${years.join(", ")}">${grid}${xlabels}${lines}<line class="hover-line" y1="${top}" y2="${H-bottom}" hidden/>${bands}</svg><div class="line-tip" hidden></div><p class="history-note">${note}</p>`;
+
+  const tip=chart.querySelector(".line-tip"), svg=chart.querySelector("svg"), vline=chart.querySelector(".hover-line");
+  chart.querySelector(".line-legend").addEventListener("click",e=>{const b=e.target.closest("[data-line]");if(!b)return;const n=b.dataset.line;hiddenLines.has(n)?hiddenLines.delete(n):hiddenLines.add(n);window.renderYearComparison();});
+  svg.addEventListener("mousemove",e=>{
+    const band=e.target.closest(".year-band"); if(!band){tip.hidden=true;vline.hidden=true;return;}
+    const year=band.dataset.year;
+    const rows=visible.map(name=>[name,series[year]?.[name]]).filter(r=>r[1]!=null).sort((a,b)=>b[1]-a[1]);
+    tip.innerHTML=`<strong>${year}</strong>${rows.map(([name,v])=>`<div class="${name===selectedTerritory?"sel":""}"><span>${name}</span><b>${formattedValue(item,v)}</b></div>`).join("")}`;
+    vline.setAttribute("x1",x(year));vline.setAttribute("x2",x(year));vline.hidden=false;tip.hidden=false;
+    const box=chart.getBoundingClientRect(), px=e.clientX-box.left, py=e.clientY-box.top;
+    tip.style.left=(px>box.width/2?px-tip.offsetWidth-14:px+14)+"px"; tip.style.top=Math.max(0,Math.min(py,box.height-tip.offsetHeight))+"px";
+  });
+  svg.addEventListener("mouseleave",()=>{tip.hidden=true;vline.hidden=true;});
 }
 
 // Tabela de indicadores. Sem pesquisa mostra só os da área ativa; com pesquisa procura em todos.
@@ -577,9 +591,9 @@ function renderYearComparison(){
 function renderCatalog(query=""){
   const body=document.querySelector("#catalog-body"),empty=document.querySelector("#catalog-empty"),caption=document.querySelector("#catalog-caption");if(!body||!empty)return;
   // Com pesquisa, procura em todos os indicadores; sem pesquisa, mostra só os da área escolhida.
-  const normalized=query.trim().toLocaleLowerCase("pt-PT");
+  const norm=t=>String(t).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("pt-PT");const normalized=norm(query.trim());
   const matches=normalized
-    ? catalog.filter(item=>`${item.name} ${item.area} ${item.year} ${item.source} ${item.dimension}`.toLocaleLowerCase("pt-PT").includes(normalized))
+    ? catalog.filter(item=>norm(`${item.name} ${item.area} ${item.year} ${item.source} ${item.dimension}`).includes(normalized))
     : catalog;
   // Filtro por botões de categoria (e subcategoria da Demografia); a pesquisa respeita o filtro.
   const filtered=matches.filter(item=>(selectedCategory==="Todas"||item.area===selectedCategory)&&(!selectedSub||item.sub===selectedSub));
@@ -607,7 +621,7 @@ function renderCatalogDetail(){
   // Detalhe por categoria (ex.: Nacionalidade → nº de pessoas por país, no território escolhido).
   const box=document.querySelector("#detail-breakdown");
   if(box){
-    const rows=(item.breakdown||[]).map(part=>({name:part.name,year:part.year,value:part.values?.[selectedTerritory]})).filter(r=>r.value!=null).sort((a,b)=>b.value-a.value);
+    const rows=(item.breakdown||[]).map(part=>({name:part.name,year:part.year,value:part.values?.[selectedTerritory]})).filter(r=>r.value!=null);
     const kind=item.breakdownLabel||"nacionalidade";
     box.hidden=!rows.length;
     // O total só se esconde quando as categorias não estão todas no ano mais recente (ex.: nacionalidades),

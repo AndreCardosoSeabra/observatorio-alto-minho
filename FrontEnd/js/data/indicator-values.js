@@ -5809,41 +5809,6 @@ const indicatorValuesByName = {
       }
     }
   },
-  "Diferença entre o salário mínimo nacional e a remuneração base média mensal dos trabalhadores por conta de outrem": {
-    "year": "2024",
-    "unit": "€",
-    "dimension": "Remuneração média menos SMN de 2024 (€820)",
-    "prefix": "€ ",
-    "suffix": "",
-    "values": {
-      "Alto Minho": 520.1,
-      "Arcos de Valdevez": 401.8,
-      "Caminha": 325.0,
-      "Melgaço": 342.5,
-      "Monção": 422.7,
-      "Paredes de Coura": 433.7,
-      "Ponte da Barca": 315.1,
-      "Ponte de Lima": 440.1,
-      "Valença": 447.0,
-      "Viana do Castelo": 626.5,
-      "Vila Nova de Cerveira": 597.4
-    },
-    "history": {
-      "2024": {
-        "Alto Minho": 520.1,
-        "Arcos de Valdevez": 401.8,
-        "Caminha": 325.0,
-        "Melgaço": 342.5,
-        "Monção": 422.7,
-        "Paredes de Coura": 433.7,
-        "Ponte da Barca": 315.1,
-        "Ponte de Lima": 440.1,
-        "Valença": 447.0,
-        "Viana do Castelo": 626.5,
-        "Vila Nova de Cerveira": 597.4
-      }
-    }
-  },
   "Desempregados inscritos nos centros de emprego e de formação profissional (média anual): total e por grupo etário": {
     "year": "2025",
     "unit": "pessoas",

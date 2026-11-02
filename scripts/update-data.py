@@ -515,8 +515,6 @@ def update_pordata(values_by_name: dict, report: list[dict]) -> int:
     sources = json.loads(PORDATA_SOURCES_PATH.read_text(encoding="utf-8"))
     updated = 0
     for name, url in sources.items():
-        if name == "Diferença entre o salário mínimo nacional e a remuneração base média mensal dos trabalhadores por conta de outrem":
-            continue
         source_id = re.search(r"-(\d+)$", url).group(1)
         path = PORDATA_DIRECTORY / f"{source_id}.xlsx"
         if not path.exists():
@@ -611,49 +609,6 @@ def update_breakdowns(values_by_name: dict, report: list[dict]) -> None:
             report.append({"indicator": f"{name} (por {label_kind})", "source": "Pordata", "status": "updated", "categories": len(items)})
         except Exception as error:
             report.append({"indicator": f"{name} (por {label_kind})", "source": "Pordata", "status": "kept-breakdown", "reason": str(error)})
-
-
-def update_salary_difference(values_by_name: dict, report: list[dict]) -> int:
-    """Calcula a diferença entre o rendimento médio (INE) e o salário mínimo nacional (Pordata, ficheiro 74.xlsx),
-    para o ano mais recente e para cada ano do histórico em que exista salário mínimo. Lança erro se o salário
-    mínimo desse ano não estiver disponível. Devolve 1 quando termina."""
-    name = "Diferença entre o salário mínimo nacional e a remuneração base média mensal dos trabalhadores por conta de outrem"
-    income = values_by_name["Rendimento médio"]
-    year = int(income["year"])
-    workbook_path = PORDATA_DIRECTORY / "74.xlsx"
-    if not workbook_path.exists():
-        raise FileNotFoundError("Falta o ficheiro Pordata 74.xlsx com o salário mínimo")
-    workbook = load_workbook(workbook_path, data_only=True, read_only=True)
-    wages: dict[int, float | int] = {}
-    for row in workbook.worksheets[0].iter_rows(values_only=True):
-        if row and len(row) > 2 and isinstance(as_number(row[0]), int) and as_number(row[2]) is not None:
-            wages.setdefault(int(as_number(row[0])), as_number(row[2]))
-    workbook.close()
-    minimum_wage = wages.get(year)
-    if minimum_wage is None or minimum_wage <= 0:
-        raise ValueError(f"Pordata 74: salário mínimo indisponível para {year}")
-    difference = {
-        territory: round(float(income["values"][territory]) - float(minimum_wage), 1)
-        for territory in TERRITORIES
-    }
-    validate_values(difference, name)
-    changed = values_by_name[name]["values"] != difference or values_by_name[name]["year"] != str(year)
-    values_by_name[name]["values"] = difference
-    values_by_name[name]["year"] = str(year)
-    difference_history = {
-        y: {t: round(float(income_values[t]) - float(wages[int(y)]), 1) for t in TERRITORIES}
-        for y, income_values in {**(income.get("history") or {}), str(year): income["values"]}.items()
-        if int(y) in wages and wages[int(y)] > 0
-    }
-    merge_history(values_by_name[name], difference_history)
-    report.append({
-        "indicator": name,
-        "source": "Pordata + INE",
-        "status": "updated" if changed else "checked",
-        "year": str(year),
-        "minimum_wage": minimum_wage,
-    })
-    return 1
 
 
 def ensure_catalog_entries(values_by_name: dict) -> int:
@@ -776,13 +731,12 @@ def main() -> None:
     pordata_count = update_pordata(values_by_name, report)
     update_breakdowns(values_by_name, report)
     ine_count = update_ine(values_by_name, report)
-    pordata_count += update_salary_difference(values_by_name, report)
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if pordata_count != expected_pordata:
         failures = [entry for entry in report if entry["source"] == "Pordata" and entry["status"] == "kept"]
         raise RuntimeError(f"Só {pordata_count} de {expected_pordata} indicadores Pordata passaram a validação. Falhas: {failures}")
-    if ine_count != 6:
+    if ine_count != len(INE_DIRECT):
         raise RuntimeError(f"Só {ine_count} indicadores INE passaram a validação")
     ensure_catalog_entries(values_by_name)
     catalog_names = {item["name"] for item in read_javascript_object(CATALOG_PATH, "indicatorCatalog")}

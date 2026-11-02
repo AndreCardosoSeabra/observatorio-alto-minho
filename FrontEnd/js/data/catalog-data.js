@@ -154,15 +154,6 @@ const indicatorCatalog = [
     "year": ""
   },
   {
-    "name": "Diferença entre o salário mínimo nacional e a remuneração base média mensal dos trabalhadores por conta de outrem",
-    "domain": "Habitação",
-    "theme": "Acesso",
-    "category": "Mercado",
-    "source": "Pordata",
-    "url": "https://www.pordata.pt/municipios/diferenca+entre+o+salario+minimo+nacional+e+a+remuneracao+base+media+mensal+dos+trabalhadores+por+conta+de+outrem-477",
-    "year": ""
-  },
-  {
     "name": "Desempregados inscritos nos centros de emprego e de formação profissional (média anual): total e por grupo etário",
     "domain": "Habitação",
     "theme": "Acesso",

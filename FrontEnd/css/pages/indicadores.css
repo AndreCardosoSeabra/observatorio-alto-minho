@@ -20,6 +20,7 @@ body[data-page="indicadores"] .subpage-toolbar { padding: 0 0 22px; }
 body[data-page="indicadores"] .catalog-section { padding: 26px 0 0; }
 body[data-page="indicadores"] .section-index { font-size: 34px; }
 body[data-page="indicadores"] .section-copy h2,
+body[data-page="indicadores"] .catalog-head { grid-template-columns: 1fr minmax(250px, 330px); }
 body[data-page="indicadores"] .catalog-head h2 { font-size: clamp(26px, 2.8vw, 36px); }
 body[data-page="indicadores"] .catalog-head .overline { margin-bottom: 8px; }
 
@@ -66,7 +67,7 @@ body[data-page="indicadores"] .detail-action { justify-self: end; }
 body[data-page="indicadores"] .catalog-table-wrap { max-height: min(48vh, 460px); }
 
 @media (min-width: 761px) and (max-width: 1080px) {
-  body[data-page="indicadores"] .catalog-head { grid-template-columns: 48px minmax(0, 1fr); gap: 12px 24px; }
+  body[data-page="indicadores"] .catalog-head { grid-template-columns: minmax(0, 1fr); gap: 12px 24px; }
   body[data-page="indicadores"] .search-control { grid-column: 2; }
   body[data-page="indicadores"] .indicator-detail { grid-template-columns: minmax(0, 1fr) auto; }
   body[data-page="indicadores"] .detail-value { text-align: left; }

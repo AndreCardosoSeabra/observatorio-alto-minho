@@ -341,3 +341,14 @@ body[data-page="comparar"] .page-workspace,
 body[data-page="metodologia"] .page-workspace {
   min-height: 100vh;
 }
+/* Gráfico de linhas (evolução por município) */
+.line-legend { display: flex; flex-wrap: wrap; gap: 6px 8px; margin-bottom: 12px; }
+.line-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--forest); font-size: 12px; cursor: pointer; }
+.line-toggle i { width: 10px; height: 10px; border-radius: 50%; }
+.line-toggle.off { opacity: .4; text-decoration: line-through; }
+.history-chart .line-group.dim { opacity: .5; }
+.history-chart .hover-line { stroke: var(--muted); stroke-dasharray: 3 3; }
+.line-tip { position: absolute; z-index: 5; min-width: 190px; padding: 10px 12px; background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.12); font-size: 12px; pointer-events: none; }
+.line-tip strong { display: block; margin-bottom: 6px; color: var(--forest); }
+.line-tip div { display: flex; justify-content: space-between; gap: 14px; padding: 1px 0; }
+.line-tip div.sel { font-weight: 700; color: var(--forest); }
