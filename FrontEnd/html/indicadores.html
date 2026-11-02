@@ -9,9 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/styles.css">
+  <!-- Estilos globais -->
+  <link rel="stylesheet" href="../css/shared/global.css">
+  <!-- Estilos da página -->
+  <link rel="stylesheet" href="../css/pages/indicadores.css">
 </head>
 <body data-page="indicadores">
+  <!-- Cabeçalho e navegação -->
   <header class="rail">
     <a class="brand" href="../../index.html" aria-label="Observatório Alto Minho — início">
       <span class="brand-symbol" aria-hidden="true"><img src="../imgs/cim-alto-minho.svg" alt=""></span>
@@ -35,52 +39,22 @@
     </div>
   </header>
 
+  <!-- Conteúdo principal -->
   <main id="top">
-    <section class="workspace page-workspace">
-      <div class="subpage-toolbar">
+      <section class="workspace page-workspace">
+      <div class="page-intro">
         <div>
-          <p class="overline">Exploração territorial</p>
-          <h1>Catálogo de indicadores</h1>
+          <p class="overline">02 · Indicadores</p>
+          <h1>Indicadores do território</h1>
         </div>
       </div>
+
       <section class="catalog-section" id="indicadores">
         <div class="catalog-layout">
-
-          <!-- Coluna 01: áreas (separadores) e cartões da área escolhida -->
-          <div class="catalog-col">
-            <section class="themes" aria-labelledby="themes-title">
-              <div class="section-index">01</div>
-              <div class="section-copy">
-                <p class="overline">Áreas de observação</p>
-                <h2 id="themes-title">Escolha uma perspetiva</h2>
-              </div>
-              <div class="theme-tabs" role="tablist" aria-label="Áreas temáticas">
-                <button class="theme active" role="tab" aria-selected="true" data-theme="Demografia">Demografia</button>
-                <button class="theme" role="tab" aria-selected="false" data-theme="Habitação">Habitação</button>
-                <button class="theme" role="tab" aria-selected="false" data-theme="Emprego">Emprego</button>
-                <button class="theme" role="tab" aria-selected="false" data-theme="Educação">Educação</button>
-                <button class="theme" role="tab" aria-selected="false" data-theme="Saúde">Saúde</button>
-                <button class="theme" role="tab" aria-selected="false" data-theme="Coesão social">Coesão social</button>
-                <button class="theme" role="tab" aria-selected="false" data-theme="Outros">Outros</button>
-              </div>
-            </section>
-
-            <section class="theme-overview" id="panorama-tematico">
-              <div class="overview-copy">
-                <p class="overline" id="theme-kicker">Área de Demografia</p>
-                <h2 id="theme-title">Estrutura e dinâmica da população</h2>
-                <p id="theme-description">Leia a evolução demográfica e compare o território com o Alto Minho.</p>
-              </div>
-              <div class="indicator-cards" id="indicator-cards"></div>
-            </section>
-          </div>
-
           <!-- Coluna 02: pesquisa, indicador selecionado e tabela -->
           <div class="catalog-col">
             <div class="catalog-head">
-              <div class="section-index">02</div>
               <div>
-                <p class="overline">Catálogo · 50 indicadores</p>
                 <h2>Encontrar um indicador</h2>
               </div>
               <label class="search-control">
@@ -88,6 +62,10 @@
                 <input id="indicator-search" type="search" placeholder="Pesquisar Indicador...">
               </label>
             </div>
+
+            <!-- Botões de categoria (preenchidos por app.js) -->
+            <div class="cat-filter" id="category-filter" role="group" aria-label="Filtrar por categoria"></div>
+            <div class="cat-filter cat-sub" id="subcategory-filter" role="group" aria-label="Filtrar por subcategoria da Demografia" hidden></div>
 
             <div class="indicator-detail" id="indicator-detail" aria-live="polite">
               <div class="detail-copy">
@@ -105,6 +83,7 @@
                 <div><dt>Leitura</dt><dd id="detail-dimension"></dd></div>
                 <div><dt>Fonte</dt><dd><a id="detail-source-link" href="#" target="_blank" rel="noopener"><span id="detail-source"></span> ↗</a></dd></div>
               </dl>
+              <div class="detail-breakdown" id="detail-breakdown" hidden></div>
               <button class="detail-action" id="indicator-compare-button" type="button">Comparar municípios <span>↓</span></button>
             </div>
 
@@ -122,11 +101,16 @@
       </section>
     </section>
   </main>
-  <script src="../js/catalog-data.js"></script>
-  <script src="../js/indicator-values.js"></script>
-  <script src="../js/map-data.js"></script>
-  <script src="../js/app.js"></script>
-  <script src="../js/powerbi-config.js"></script>
-  <script src="../js/powerbi-embed.js"></script>
+  <!-- Dados gerados -->
+  <script src="../js/data/catalog-data.js"></script>
+  <script src="../js/data/indicator-values.js"></script>
+  <script src="../js/data/map-data.js"></script>
+  <!-- Núcleo partilhado -->
+  <script src="../js/shared/app.js"></script>
+  <!-- Lógica da página -->
+  <script src="../js/pages/indicadores.js"></script>
+  <!-- Power BI -->
+  <script src="../js/shared/powerbi-config.js"></script>
+  <script src="../js/shared/powerbi-embed.js"></script>
 </body>
 </html>

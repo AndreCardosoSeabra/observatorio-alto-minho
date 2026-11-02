@@ -9,10 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/styles.css">
-  <link rel="stylesheet" href="../css/transferencias.css">
+  <!-- Estilos globais -->
+  <link rel="stylesheet" href="../css/shared/global.css">
+  <!-- Estilos da página -->
+  <link rel="stylesheet" href="../css/pages/transferencias.css">
 </head>
 <body data-page="transferencias">
+  <!-- Cabeçalho e navegação -->
   <header class="rail">
     <a class="brand" href="../../index.html" aria-label="Observatório Alto Minho — início">
       <span class="brand-symbol" aria-hidden="true"><img src="../imgs/cim-alto-minho.svg" alt=""></span>
@@ -36,43 +39,48 @@
     </div>
   </header>
 
+  <!-- Conteúdo principal -->
   <main id="top">
     <section class="workspace page-workspace">
-      <section class="themes" aria-labelledby="themes-title">
-        <div class="section-index">05</div>
-        <div class="section-copy">
-          <p class="overline">Áreas de Documentos</p>
-          <h2 id="themes-title">Documentos para Transferência</h2>
+      <div class="page-intro">
+        <div>
+          <p class="overline">05 · Documentos</p>
+          <h1>Documentos para transferência</h1>
+          <p>Relatórios e guias em PDF para consultar e partilhar.</p>
         </div>
-      </section>
-
+      </div>
       <div class="doc-grid">
         <article class="doc-card">
-          <img class="doc-thumb" src="../imgs/images.png" alt="Capa do Guia de Ordenamento do Território" loading="lazy">
+          <img class="doc-thumb" src="../imgs/images.png" alt="Pré-visualização de Título do documento 1" loading="lazy">
           <div class="doc-body">
-            <h3><a href="../docs/1.pdf" download="1.pdf">Título do documento 1</a></h3>
-            <p>Descrição 1.</p>
+            <h3>Título do documento 1</h3>
+            <p>Descrição do documento 1.</p>
+            <a class="doc-btn" href="../docs/1.pdf" download="1.pdf">Transferir PDF</a>
           </div>
         </article>
-
         <article class="doc-card">
-          <img class="doc-thumb" src="../imgs/images.png" alt="Capa do segundo documento" loading="lazy">
+          <img class="doc-thumb" src="../imgs/images.png" alt="Pré-visualização de Título do documento 2" loading="lazy">
           <div class="doc-body">
-            <h3><a href="../docs/2.pdf" download="2.pdf">Título do documento 2</a></h3>
-            <p>Descriçã 2.</p>
+            <h3>Título do documento 2</h3>
+            <p>Descrição do documento 2.</p>
+            <a class="doc-btn" href="../docs/2.pdf" download="2.pdf">Transferir PDF</a>
           </div>
         </article>
-
         <!-- copiar o <article> acima para cada novo documento -->
       </div>
     </section>
   </main>
 
-  <script src="../js/catalog-data.js"></script>
-  <script src="../js/indicator-values.js"></script>
-  <script src="../js/map-data.js"></script>
-  <script src="../js/app.js"></script>
-  <script src="../js/powerbi-config.js"></script>
-  <script src="../js/powerbi-embed.js"></script>
+  <!-- Dados gerados -->
+  <script src="../js/data/catalog-data.js"></script>
+  <script src="../js/data/indicator-values.js"></script>
+  <script src="../js/data/map-data.js"></script>
+  <!-- Núcleo partilhado -->
+  <script src="../js/shared/app.js"></script>
+  <!-- Lógica da página -->
+  <script src="../js/pages/transferencias.js"></script>
+  <!-- Power BI -->
+  <script src="../js/shared/powerbi-config.js"></script>
+  <script src="../js/shared/powerbi-embed.js"></script>
 </body>
 </html>

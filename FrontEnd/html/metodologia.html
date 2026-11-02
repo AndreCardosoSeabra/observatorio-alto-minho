@@ -9,9 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/styles.css">
+  <!-- Estilos globais -->
+  <link rel="stylesheet" href="../css/shared/global.css">
+  <!-- Estilos da página -->
+  <link rel="stylesheet" href="../css/pages/metodologia.css">
 </head>
 <body data-page="metodologia">
+  <!-- Cabeçalho e navegação -->
   <header class="rail">
     <a class="brand" href="../../index.html" aria-label="Observatório Alto Minho — início">
       <span class="brand-symbol" aria-hidden="true"><img src="../imgs/cim-alto-minho.svg" alt=""></span>
@@ -35,30 +39,48 @@
     </div>
   </header>
 
+  <!-- Conteúdo principal -->
   <main id="top">
     <section class="workspace page-workspace">
-      <section class="method-section" id="metodologia">
-        <div class="method-intro">
-          <div class="section-index">04</div>
-          <p class="overline">Metodologia</p>
-          <h2>Dados comparáveis,<br>decisões mais claras.</h2>
+      <div class="page-intro">
+        <div>
+          <p class="overline">04 · Metodologia</p>
+          <h1>Dados comparáveis, decisões mais claras</h1>
           <p>O observatório organiza a informação estatística do Alto Minho com regras comuns de fonte, período e território.</p>
         </div>
-        <div class="method-list">
-          <article><b>Fontes documentadas</b><p>Cada indicador identifica a sua origem no INE, nos Censos ou na Pordata.</p></article>
-          <article><b>Atualização rastreável</b><p>O sistema regista a série e o ano mais recente que foram validados.</p></article>
-          <article><b>Escala territorial</b><p>São apresentados os dez municípios e o Alto Minho enquanto NUTS III.</p></article>
-          <article><b>Comparação homogénea</b><p>A definição, unidade e período mantêm-se iguais entre territórios.</p></article>
-        </div>
-        <p class="prototype-note">Protótipo funcional com valores para os 50 indicadores da matriz do projeto, extraídos das bases de trabalho do INE e da Pordata. Cada leitura identifica o ano e a dimensão apresentados.</p>
-      </section>
+      </div>
+      <div class="method-grid">
+        <article class="method-card">
+          <span class="method-num">01</span>
+          <h2>Fontes dos dados</h2>
+          <p>Cada indicador identifica a sua origem, com ligação direta à fonte oficial.</p>
+          <div class="tags"><span>PORDATA</span><span>INE</span><span>Censos</span></div>
+        </article>
+        <article class="method-card">
+          <span class="method-num">02</span>
+          <h2>Atualização dos dados</h2>
+          <p>Processo automático semanal: todas as segundas-feiras os dados são consultados às fontes, validados (cobertura, ano e coerência) e só então publicados.</p>
+          <div class="tags"><span>Semanal</span><span>Automático</span></div>
+        </article>
+        <article class="method-card">
+          <span class="method-num">03</span>
+          <h2>Escala territorial</h2>
+          <p>São apresentados o Alto Minho enquanto NUTS III e os seus 10 municípios, com limites da CAOP (Direção-Geral do Território).</p>
+          <div class="tags"><span>NUTS III Alto Minho</span><span>10 municípios</span></div>
+        </article>
+      </div>
     </section>
   </main>
-  <script src="../js/catalog-data.js"></script>
-  <script src="../js/indicator-values.js"></script>
-  <script src="../js/map-data.js"></script>
-  <script src="../js/app.js"></script>
-  <script src="../js/powerbi-config.js"></script>
-  <script src="../js/powerbi-embed.js"></script>
+  <!-- Dados gerados -->
+  <script src="../js/data/catalog-data.js"></script>
+  <script src="../js/data/indicator-values.js"></script>
+  <script src="../js/data/map-data.js"></script>
+  <!-- Núcleo partilhado -->
+  <script src="../js/shared/app.js"></script>
+  <!-- Lógica da página -->
+  <script src="../js/pages/metodologia.js"></script>
+  <!-- Power BI -->
+  <script src="../js/shared/powerbi-config.js"></script>
+  <script src="../js/shared/powerbi-embed.js"></script>
 </body>
 </html>

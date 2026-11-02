@@ -93,12 +93,12 @@ jobs:
 
       - name: Publicar alterações
         run: |
-          if git diff --quiet -- FrontEnd/js/indicator-values.js FrontEnd/js/catalog-data.js powerbi-data.csv powerbi-historico.csv; then
+          if git diff --quiet -- FrontEnd/js/data/indicator-values.js FrontEnd/js/data/catalog-data.js powerbi-data.csv powerbi-historico.csv; then
             echo "Não existem dados novos."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add FrontEnd/js/indicator-values.js FrontEnd/js/catalog-data.js powerbi-data.csv powerbi-historico.csv
+          git add FrontEnd/js/data/indicator-values.js FrontEnd/js/data/catalog-data.js powerbi-data.csv powerbi-historico.csv
           git commit -m "Atualizar indicadores do INE e da Pordata"
           git push

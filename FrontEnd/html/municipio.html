@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Observatório territorial da CIM Alto Minho com indicadores municipais do INE e da Pordata.">
+  <title>Município | Observatório Alto Minho</title>
+  <link rel="icon" type="image/svg+xml" href="../imgs/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Estilos globais -->
+  <link rel="stylesheet" href="../css/shared/global.css">
+  <!-- Estilos da página -->
+  <link rel="stylesheet" href="../css/pages/municipio.css">
+</head>
+<body data-page="municipio">
+  <!-- Cabeçalho e navegação -->
+  <header class="rail">
+    <a class="brand" href="../../index.html" aria-label="Observatório Alto Minho — início">
+      <span class="brand-symbol" aria-hidden="true"><img src="../imgs/cim-alto-minho.svg" alt=""></span>
+      <span><b>Alto Minho</b><small>Observatório territorial</small></span>
+    </a>
+    <div class="rail-territory">
+      <label for="territory-select">Território em análise</label>
+      <select id="territory-select" aria-label="Escolha o território"></select>
+      <p>10 municípios · NUTS III Alto Minho</p>
+    </div>
+    <nav aria-label="Navegação principal">
+      <a class="active" aria-current="page" href="../../index.html"><span>01</span>Retrato</a>
+      <a href="./indicadores.html"><span>02</span>Indicadores</a>
+      <a href="./comparar.html"><span>03</span>Comparar</a>
+      <a href="./metodologia.html"><span>04</span>Metodologia</a>
+      <a href="./transferencias.html"><span>05</span>Documentos</a>
+    </nav>
+    <div class="rail-note">
+      <span class="source-dot"></span>
+      <p>Dados estatísticos<br><strong>INE · Pordata</strong></p>
+    </div>
+  </header>
+
+  <!-- Conteúdo principal -->
+  <main id="top" class="mun-main"><div id="mun-root"></div></main>
+  <!-- Dados gerados -->
+  <script src="../js/data/catalog-data.js"></script>
+  <script src="../js/data/indicator-values.js"></script>
+  <script src="../js/data/map-data.js"></script>
+  <!-- Núcleo partilhado -->
+  <script src="../js/shared/app.js"></script>
+  <!-- Lógica da página -->
+  <script src="../js/pages/municipio.js"></script>
+  <!-- Power BI -->
+  <script src="../js/shared/powerbi-config.js"></script>
+  <script src="../js/shared/powerbi-embed.js"></script>
+</body>
+</html>

@@ -1,3 +1,14 @@
+/* Página Documentos: cartões de documentos e ajustes */
+/* Documentos */
+body[data-page="transferencias"] .doc-grid { padding-top: 8px; }
+.doc-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 22px; background: #fff; border: 1px solid var(--line); }
+.doc-thumb { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--paper); }
+.doc-body { display: flex; flex-direction: column; gap: 10px; padding: 22px; flex: 1; }
+.doc-body h3 { margin: 0; font: 400 24px/1.1 "DM Serif Display", serif; color: var(--forest); }
+.doc-body p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.doc-btn { align-self: flex-start; margin-top: auto; display: inline-flex; align-items: center; min-height: 44px; padding: 0 24px; border-radius: 999px; background: var(--forest); color: var(--lime); font-size: 14px; font-weight: 600; text-decoration: none; }
+.doc-btn:hover { background: var(--forest-2); }
+
 /* Página Transferências: ajustes sobre o styles.css */
 
 /* O .workspace já dá 52px no topo, por isso o .themes não precisa dos seus 58px */

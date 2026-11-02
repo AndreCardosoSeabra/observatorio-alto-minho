@@ -1,0 +1,94 @@
+/* Página Indicadores */
+/* Estilos exclusivos da página Indicadores. */
+.ind-modal { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(21,59,50,.55); }
+.ind-modal[hidden] { display: none; }
+.ind-dialog { width: min(640px, 100%); max-height: 90vh; overflow: auto; background: #fff; border-radius: 22px; padding: 30px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+.ind-dialog .overline { margin: 0; }
+.ind-dialog h2 { margin: 0; font-size: 32px; line-height: 1.1; color: var(--forest); }
+.ind-dialog dl { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.ind-dialog dt { font-size: 12px; color: var(--muted); }
+.ind-dialog dd { margin: 4px 0 0; font-size: 15px; font-weight: 500; }
+.ind-dialog dd a { color: var(--forest-2); }
+.ind-dialog .full { grid-column: 1 / -1; }
+.ind-close { align-self: flex-start; min-height: 44px; padding: 0 24px; border: 0; border-radius: 999px; background: var(--forest); color: var(--lime); font-weight: 600; cursor: pointer; }
+@media (max-width: 760px) { .ind-dialog dl { grid-template-columns: 1fr; } }
+
+/* Layout e componentes exclusivos da página Indicadores. */
+/* ===== Página Indicadores: layout compacto (menos scroll) =====
+   Tudo limitado a body[data-page="indicadores"] para não afetar as outras páginas. */
+body[data-page="indicadores"] .subpage-toolbar { padding: 0 0 22px; }
+body[data-page="indicadores"] .catalog-section { padding: 26px 0 0; }
+body[data-page="indicadores"] .section-index { font-size: 34px; }
+body[data-page="indicadores"] .section-copy h2,
+body[data-page="indicadores"] .catalog-head { grid-template-columns: 1fr minmax(250px, 330px); }
+body[data-page="indicadores"] .catalog-head h2 { font-size: clamp(26px, 2.8vw, 36px); }
+body[data-page="indicadores"] .catalog-head .overline { margin-bottom: 8px; }
+
+/* Painel do indicador selecionado */
+body[data-page="indicadores"] .indicator-detail { gap: 14px 42px; margin-top: 20px; padding: 18px 24px; }
+body[data-page="indicadores"] .detail-copy h3 { font-size: clamp(24px, 2.4vw, 32px); }
+body[data-page="indicadores"] .detail-value strong { font-size: clamp(30px, 3.2vw, 42px); }
+
+/* Separadores de área */
+body[data-page="indicadores"] .themes { padding: 20px 0 14px; }
+@media (min-width: 1081px) {
+  body[data-page="indicadores"] .themes { grid-template-columns: 56px 340px 1fr; }
+}
+
+/* Cartões da área escolhida */
+body[data-page="indicadores"] .theme-overview { gap: 40px; padding: 22px 0 26px; }
+body[data-page="indicadores"] .overview-copy h2 { font-size: clamp(28px, 3vw, 40px); }
+body[data-page="indicadores"] .overview-copy h2 { margin-bottom: 12px; }
+body[data-page="indicadores"] .indicator { min-height: 56px; }
+body[data-page="indicadores"] .indicator strong { font-size: 26px; }
+
+/* Tabela: cabeçalho fixo e scroll só dentro da tabela (em vez de alongar a página) */
+body[data-page="indicadores"] .catalog-table-wrap { max-height: 340px; margin-top: 12px; overflow: auto; }
+body[data-page="indicadores"] th { position: sticky; top: 0; z-index: 1; padding: 10px 12px; background: var(--paper); box-shadow: 0 1px 0 var(--line); }
+body[data-page="indicadores"] td { padding: 9px 12px; }
+
+/* Mantém áreas e catálogo numa sequência de leitura clara em qualquer largura. */
+body[data-page="indicadores"] .catalog-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
+body[data-page="indicadores"] .catalog-col { min-width: 0; }
+body[data-page="indicadores"] #catalog-caption { margin: 22px 0 0; }
+@media (min-width: 1280px) {
+  body[data-page="indicadores"] table { min-width: 0; }
+  body[data-page="indicadores"] td, body[data-page="indicadores"] th { padding-left: 8px; padding-right: 8px; }
+  body[data-page="indicadores"] td { font-size: 13px; }
+}
+
+body[data-page="indicadores"] .themes { grid-template-columns: 48px minmax(0, 1fr); }
+body[data-page="indicadores"] .theme-tabs { grid-column: 1 / -1; justify-content: flex-start; }
+body[data-page="indicadores"] .indicator-detail { grid-template-columns: minmax(0, 1fr) minmax(190px, .45fr); }
+body[data-page="indicadores"] .detail-meta,
+body[data-page="indicadores"] .detail-action { grid-column: 1 / -1; }
+body[data-page="indicadores"] .detail-meta { flex-wrap: wrap; gap: 14px 28px; }
+body[data-page="indicadores"] .detail-action { justify-self: end; }
+body[data-page="indicadores"] .catalog-table-wrap { max-height: min(48vh, 460px); }
+
+@media (min-width: 761px) and (max-width: 1080px) {
+  body[data-page="indicadores"] .catalog-head { grid-template-columns: minmax(0, 1fr); gap: 12px 24px; }
+  body[data-page="indicadores"] .search-control { grid-column: 2; }
+  body[data-page="indicadores"] .indicator-detail { grid-template-columns: minmax(0, 1fr) auto; }
+  body[data-page="indicadores"] .detail-value { text-align: left; }
+}
+
+@media (max-width: 760px) {
+  body[data-page="indicadores"] .indicator-detail { grid-template-columns: minmax(0, 1fr); }
+  body[data-page="indicadores"] .detail-value { text-align: left; }
+}
+
+/* Botões de categoria */
+.cat-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.cat-filter[hidden] { display: none; }
+.cat-filter.cat-sub { margin-top: 10px; padding-left: 14px; border-left: 3px solid var(--yellow-ink); }
+.cat-btn { min-height: 38px; padding: 0 16px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); font: inherit; font-size: 13px; cursor: pointer; transition: .15s ease; }
+.cat-btn:hover { border-color: var(--forest); color: var(--forest); }
+.cat-btn.active { background: var(--forest); border-color: var(--forest); color: var(--lime); font-weight: 600; }
+.cat-sub .cat-btn { min-height: 34px; font-size: 12px; }
+/* Detalhe por categoria (ex.: Nacionalidade) */
+.detail-breakdown { grid-column: 1 / -1; }
+.detail-breakdown table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.detail-breakdown th { text-align: left; padding: 4px 8px; color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.detail-breakdown td { padding: 5px 8px; border-top: 1px solid rgba(0,0,0,.08); }
+.detail-breakdown td:nth-child(2) { font-weight: 600; color: var(--forest); }

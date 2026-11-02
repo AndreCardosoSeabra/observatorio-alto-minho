@@ -9,9 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/styles.css">
+  <!-- Estilos globais -->
+  <link rel="stylesheet" href="../css/shared/global.css">
+  <!-- Estilos da página -->
+  <link rel="stylesheet" href="../css/pages/comparar.css">
 </head>
 <body data-page="comparar">
+  <!-- Cabeçalho e navegação -->
   <header class="rail">
     <a class="brand" href="../../index.html" aria-label="Observatório Alto Minho — início">
       <span class="brand-symbol" aria-hidden="true"><img src="../imgs/cim-alto-minho.svg" alt=""></span>
@@ -35,41 +39,50 @@
     </div>
   </header>
 
+  <!-- Conteúdo principal -->
   <main id="top">
     <section class="workspace page-workspace">
-      <div class="subpage-toolbar compare-page-header">
+      <div class="page-intro">
         <div>
-          <p class="overline">Benchmarking territorial</p>
+          <p class="overline">03 · Comparar</p>
           <h1>Comparação municipal</h1>
+          <p>Compare os dez municípios do Alto Minho num indicador e veja como evoluiu ao longo dos anos.</p>
         </div>
       </div>
-      <section class="compare-section" id="comparar">
-        <div class="section-index">03</div>
-        <div class="compare-head">
-          <div>
-            <p class="overline">Benchmarking municipal</p>
-            <h2>Dez municípios,<br>uma escala comum</h2>
-          </div>
+
+      <section class="card" id="comparar">
+        <div class="card-head">
+          <div><p class="overline">Gráfico 1</p><h2>Valor por município</h2></div>
           <label class="compare-control">Indicador a comparar
             <select id="compare-indicator" aria-label="Indicador a comparar"></select>
           </label>
         </div>
         <div class="chart" id="comparison-chart" aria-label="Comparação dos municípios"></div>
-        <div class="history-section" id="evolucao">
-          <div class="history-head">
-            <p class="overline">Anos disponíveis</p>
-            <h2>Comparação entre anos</h2>
-          </div>
-          <div class="history-chart" id="year-chart"></div>
+      </section>
+
+      <section class="card" id="evolucao">
+        <div class="card-head">
+          <div><p class="overline">Gráfico 2</p><h2>Evolução ao longo dos anos</h2></div>
+          <form class="year-filter" id="year-filter">
+            <label>Ano inicial<select id="year-from"></select></label>
+            <label>Ano final<select id="year-to"></select></label>
+            <button type="submit">Aplicar</button>
+          </form>
         </div>
+        <div class="history-chart" id="year-chart"></div>
       </section>
     </section>
   </main>
-  <script src="../js/catalog-data.js"></script>
-  <script src="../js/indicator-values.js"></script>
-  <script src="../js/map-data.js"></script>
-  <script src="../js/app.js"></script>
-  <script src="../js/powerbi-config.js"></script>
-  <script src="../js/powerbi-embed.js"></script>
+  <!-- Dados gerados -->
+  <script src="../js/data/catalog-data.js"></script>
+  <script src="../js/data/indicator-values.js"></script>
+  <script src="../js/data/map-data.js"></script>
+  <!-- Núcleo partilhado -->
+  <script src="../js/shared/app.js"></script>
+  <!-- Lógica da página -->
+  <script src="../js/pages/comparar.js"></script>
+  <!-- Power BI -->
+  <script src="../js/shared/powerbi-config.js"></script>
+  <script src="../js/shared/powerbi-embed.js"></script>
 </body>
 </html>

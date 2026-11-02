@@ -19,14 +19,14 @@ from openpyxl import load_workbook
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VALUES_PATH = ROOT / "FrontEnd" / "js" / "indicator-values.js"
-CATALOG_PATH = ROOT / "FrontEnd" / "js" / "catalog-data.js"
+VALUES_PATH = ROOT / "FrontEnd" / "js" / "data" / "indicator-values.js"
+CATALOG_PATH = ROOT / "FrontEnd" / "js" / "data" / "catalog-data.js"
 PORDATA_SOURCES_PATH = ROOT / "data" / "pordata-sources.json"
 PORDATA_DIRECTORY = ROOT / ".cache" / "pordata"
 REPORT_PATH = ROOT / "data" / "update-report.json"
 POWERBI_PATH = ROOT / "powerbi-data.csv"
 POWERBI_HISTORY_PATH = ROOT / "powerbi-historico.csv"
-HISTORY_YEARS = 5  # nº de anos mais recentes guardados por indicador (inclui o ano mais recente)
+HISTORY_YEARS = 1000  # nº máximo de anos guardados por indicador (1000 = todos os anos disponíveis)
 
 TERRITORIES = [
     "Alto Minho",
@@ -50,12 +50,39 @@ PORDATA_FIXED_POSITIONS = {
     "Estabelecimentos nos ensinos pré-escolar, básico e secundário: por nível de ensino": (0, 1, 2, 3, 4),
 }
 
-# Dados base de indicadores de posição fixa, usados para criar a entrada em indicator-values.js quando ainda não existe.
-PORDATA_FIXED_ENTRY = {
-    "unit": "estabelecimentos",
-    "dimension": "Soma dos 5 níveis de ensino (cada estabelecimento conta uma vez por cada ensino que ministra)",
-    "prefix": "",
-    "suffix": "",
+# Dados base de cada indicador de posição fixa, usados para criar a entrada em indicator-values.js (e em
+# catalog-data.js) quando ainda não existe. "catalog" = domínio/tema/categoria no catálogo.
+_PF = (0,)  # 1.ª coluna de cada ano = "Total" nos ficheiros "total e por sexo / grupo etário" da Pordata
+_ENSINO = "Estabelecimentos nos ensinos pré-escolar, básico e secundário: por nível de ensino"
+_RSI = "Beneficiários do Rendimento Mínimo Garantido e Rendimento Social de Inserção da Segurança Social: total e por grupo etário"
+_ESTR = "População estrangeira com estatuto legal de residente: total e por sexo"
+_SEXO = "População residente: total e por sexo"
+_GANHO = "Ganho médio mensal dos trabalhadores por conta de outrem: total e por sexo"
+PORDATA_FIXED_POSITIONS.update({
+    "Freguesias": _PF,
+    "Índice de dependência total": _PF,
+    _SEXO: _PF,
+    _GANHO: _PF,
+    _RSI: _PF,
+    _ESTR: _PF,
+    "Saldo Total": _PF,
+})
+PORDATA_FIXED_ENTRIES = {
+    _ENSINO: {"unit": "estabelecimentos", "dimension": "Soma dos 5 níveis de ensino (cada estabelecimento conta uma vez por cada ensino que ministra)", "prefix": "", "suffix": ""},
+    "Freguesias": {"unit": "freguesias", "dimension": "Número de freguesias", "prefix": "", "suffix": "",
+                   "catalog": ("Contexto Geográfico", "", "Divisão administrativa")},
+    "Índice de dependência total": {"unit": "índice", "dimension": "Jovens e idosos por 100 pessoas em idade ativa", "prefix": "", "suffix": "",
+                                    "catalog": ("Demografia", "Dinâmica populacional", "Estrutura da População")},
+    _SEXO: {"unit": "pessoas", "dimension": "Total (estimativa a 31 de dezembro)", "prefix": "", "suffix": "",
+            "catalog": ("Demografia", "Dinâmica populacional", "Distribuição da população")},
+    _GANHO: {"unit": "€", "dimension": "Ganho médio mensal — total", "prefix": "€ ", "suffix": "",
+             "catalog": ("Habitação", "Rendimentos", "Vulnerabilidade")},
+    _RSI: {"unit": "pessoas", "dimension": "Total (todos os grupos etários)", "prefix": "", "suffix": "",
+           "catalog": ("Proteção Social", "Acesso", "Cuidados")},
+    _ESTR: {"unit": "pessoas", "dimension": "Total", "prefix": "", "suffix": "",
+            "catalog": ("Proteção Social", "População imigrante", "População imigrante")},
+    "Saldo Total": {"unit": "pessoas", "dimension": "Saldo total anual (saldo natural + saldo migratório)", "prefix": "", "suffix": "",
+                    "catalog": ("Demografia", "Dinâmica populacional", "Distribuição da população")},
 }
 
 INE_DIRECT = {
@@ -91,8 +118,8 @@ def read_javascript_object(path: Path, variable: str) -> dict:
 
 def write_javascript_object(path: Path, comment: str, variable: str, value: dict) -> None:
     """Escreve o dicionário de volta num .js (`// comentário` + `const variavel = {...};`) em UTF-8,
-    compacto e sem escapar acentos."""
-    payload = json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+    indentado em várias linhas e sem escapar acentos."""
+    payload = json.dumps(value, ensure_ascii=False, indent=2)
     path.write_bytes(f"// {comment}\nconst {variable} = {payload};\n".encode("utf-8"))
 
 
@@ -303,10 +330,9 @@ def merge_history(entry: dict, new_series: dict[str, dict]) -> int:
 
 
 def update_ine(values_by_name: dict, report: list[dict]) -> int:
-    """Atualiza os indicadores do INE (os de INE_DIRECT e a diferença salarial H/M) em `values_by_name`.
+    """Atualiza os indicadores do INE (os de INE_DIRECT) em `values_by_name`.
     Para cada um: grava o ano completo mais recente e o histórico dos anos anteriores. Se o INE só tiver um ano
-    mais antigo do que o já guardado, mantém o valor atual. A diferença H/M é calculada a partir dos ganhos de
-    homens e mulheres: (H − M) / H × 100. Regista o resultado em `report` e devolve quantos indicadores foram validados."""
+    mais antigo do que o já guardado, mantém o valor atual. Regista o resultado em `report` e devolve quantos indicadores foram validados."""
     updated = 0
     cache: dict[str, dict] = {}
     for name, config in INE_DIRECT.items():
@@ -331,35 +357,6 @@ def update_ine(values_by_name: dict, report: list[dict]) -> int:
         years_stored = merge_history(values_by_name[name], history)
         updated += 1
         report.append({"indicator": name, "source": "INE", "status": "updated" if changed else "checked", "year": year, "years_in_history": years_stored})
-
-    name = "Diferença salarial H/M (%)"
-    item = cache.get("0012649")
-    if item is None:
-        payload = fetch_json("https://www.ine.pt/ine/json_indicador/pindica.jsp?op=2&varcd=0012649&lang=PT")
-        item = payload[0]
-    year_h, men_rows = rows_for_latest_complete_year(item, {"dim_3": "TOT", "dim_4": "1"})
-    year_m, women_rows = rows_for_latest_complete_year(item, {"dim_3": "TOT", "dim_4": "2"})
-    if year_h != year_m:
-        raise ValueError("INE 0012649: os anos por sexo não coincidem")
-    men = {NORMALIZED_TERRITORIES[normalized(row["geodsg"])]: float(row["valor"]) for row in men_rows}
-    women = {NORMALIZED_TERRITORIES[normalized(row["geodsg"])]: float(row["valor"]) for row in women_rows}
-    gap = {territory: round((men[territory] - women[territory]) / men[territory] * 100, 4) for territory in TERRITORIES}
-    validate_values(gap, name)
-    if int(year_h) >= int(values_by_name[name]["year"]):
-        changed = values_by_name[name]["values"] != gap or values_by_name[name]["year"] != year_h
-        values_by_name[name]["values"] = gap
-        values_by_name[name]["year"] = year_h
-        men_series = ine_series(item, {"dim_3": "TOT", "dim_4": "1"})
-        women_series = ine_series(item, {"dim_3": "TOT", "dim_4": "2"})
-        gap_history = {
-            y: {t: round((men_series[y][t] - women_series[y][t]) / men_series[y][t] * 100, 4) for t in TERRITORIES}
-            for y in men_series
-            if y in women_series and all(float(men_series[y][t]) != 0 for t in TERRITORIES)
-        }
-        gap_history[year_h] = gap
-        years_stored = merge_history(values_by_name[name], gap_history)
-        updated += 1
-        report.append({"indicator": name, "source": "INE", "status": "updated" if changed else "checked", "year": year_h, "years_in_history": years_stored})
     return updated
 
 
@@ -518,14 +515,12 @@ def update_pordata(values_by_name: dict, report: list[dict]) -> int:
     sources = json.loads(PORDATA_SOURCES_PATH.read_text(encoding="utf-8"))
     updated = 0
     for name, url in sources.items():
-        if name == "Diferença entre o salário mínimo nacional e a remuneração base média mensal dos trabalhadores por conta de outrem":
-            continue
         source_id = re.search(r"-(\d+)$", url).group(1)
         path = PORDATA_DIRECTORY / f"{source_id}.xlsx"
         if not path.exists():
             raise FileNotFoundError(f"Falta o ficheiro Pordata {path.name}")
         if name not in values_by_name and name in PORDATA_FIXED_POSITIONS:
-            values_by_name[name] = {"year": "0", **PORDATA_FIXED_ENTRY, "values": {}}
+            values_by_name[name] = {"year": "0", **{k: v for k, v in PORDATA_FIXED_ENTRIES[name].items() if k != "catalog"}, "values": {}}
         current = values_by_name[name]
         try:
             if name in PORDATA_FIXED_POSITIONS:
@@ -539,7 +534,11 @@ def update_pordata(values_by_name: dict, report: list[dict]) -> int:
             history[year] = selected
             years_stored = merge_history(current, history)
             updated += 1
-            report.append({"indicator": name, "source": "Pordata", "status": "updated" if changed else "checked", "year": year, "match_error": round(score, 4), "columns": columns, "years_in_history": years_stored, "years_skipped": skipped})
+            entry_report = {"indicator": name, "source": "Pordata", "status": "updated" if changed else "checked", "year": year, "match_error": round(score, 4), "columns": columns, "years_in_history": years_stored, "years_skipped": skipped}
+            if years_stored <= 2:
+                entry_report["warning"] = f"só {years_stored} ano(s) no ficheiro {source_id}.xlsx: confirmar se a exportação trouxe todos os anos"
+                print(f"[aviso] {name}: {entry_report['warning']}")
+            report.append(entry_report)
         except Exception as error:
             report.append({"indicator": name, "source": "Pordata", "status": "kept", "reason": str(error)})
     alias = "Pop. Estrangeira c/ estatuto residente"
@@ -550,47 +549,86 @@ def update_pordata(values_by_name: dict, report: list[dict]) -> int:
     return updated
 
 
-def update_salary_difference(values_by_name: dict, report: list[dict]) -> int:
-    """Calcula a diferença entre o rendimento médio (INE) e o salário mínimo nacional (Pordata, ficheiro 74.xlsx),
-    para o ano mais recente e para cada ano do histórico em que exista salário mínimo. Lança erro se o salário
-    mínimo desse ano não estiver disponível. Devolve 1 quando termina."""
-    name = "Diferença entre o salário mínimo nacional e a remuneração base média mensal dos trabalhadores por conta de outrem"
-    income = values_by_name["Rendimento médio"]
-    year = int(income["year"])
-    workbook_path = PORDATA_DIRECTORY / "74.xlsx"
-    if not workbook_path.exists():
-        raise FileNotFoundError("Falta o ficheiro Pordata 74.xlsx com o salário mínimo")
-    workbook = load_workbook(workbook_path, data_only=True, read_only=True)
-    wages: dict[int, float | int] = {}
-    for row in workbook.worksheets[0].iter_rows(values_only=True):
-        if row and len(row) > 2 and isinstance(as_number(row[0]), int) and as_number(row[2]) is not None:
-            wages.setdefault(int(as_number(row[0])), as_number(row[2]))
-    workbook.close()
-    minimum_wage = wages.get(year)
-    if minimum_wage is None or minimum_wage <= 0:
-        raise ValueError(f"Pordata 74: salário mínimo indisponível para {year}")
-    difference = {
-        territory: round(float(income["values"][territory]) - float(minimum_wage), 1)
-        for territory in TERRITORIES
-    }
-    validate_values(difference, name)
-    changed = values_by_name[name]["values"] != difference or values_by_name[name]["year"] != str(year)
-    values_by_name[name]["values"] = difference
-    values_by_name[name]["year"] = str(year)
-    difference_history = {
-        y: {t: round(float(income_values[t]) - float(wages[int(y)]), 1) for t in TERRITORIES}
-        for y, income_values in {**(income.get("history") or {}), str(year): income["values"]}.items()
-        if int(y) in wages and wages[int(y)] > 0
-    }
-    merge_history(values_by_name[name], difference_history)
-    report.append({
-        "indicator": name,
-        "source": "Pordata + INE",
-        "status": "updated" if changed else "checked",
-        "year": str(year),
-        "minimum_wage": minimum_wage,
-    })
-    return 1
+# Indicadores com detalhe por categoria: (nome, ficheiro Pordata, rótulo da categoria, renomear categorias).
+# Ao adicionar um indicador novo com detalhe, acrescentar aqui e o update-data.py passa a atualizá-lo.
+BREAKDOWNS = (
+    ("População estrangeira com estatuto legal de residente: total e por algumas nacionalidades", "101.xlsx", "nacionalidade", {}),
+    ("População estrangeira com estatuto legal de residente: total e por sexo", "99.xlsx", "sexo", {"Masculino": "Homens", "Feminino": "Mulheres"}),
+    ("População residente: total e por sexo", "357.xlsx", "sexo", {"Masculino": "Homens", "Feminino": "Mulheres", "Homens": "Homens", "Mulheres": "Mulheres"}),
+    ("Obitos por algumas causas de morte (%)", "373.xlsx", "causa de morte", {}),
+    ("Estabelecimentos nos ensinos pré-escolar, básico e secundário: por nível de ensino", "213.xlsx", "nível de ensino", {}),
+    ("Ganho médio mensal dos trabalhadores por conta de outrem: total e por sexo", "282.xlsx", "sexo", {"Masculino": "Homens", "Feminino": "Mulheres"}),
+    ("Profissionais de saúde: médicos, dentistas, enfermeiros e farmacêuticos", "442.xlsx", "profissão", {}),
+    ("Desempregados inscritos nos centros de emprego e de formação profissional (média anual): total e por grupo etário", "221.xlsx", "grupo etário", {}),
+    ("Beneficiários do Rendimento Mínimo Garantido e Rendimento Social de Inserção da Segurança Social: total e por sexo", "513.xlsx", "sexo", {"Masculino": "Homens", "Feminino": "Mulheres", "Homens": "Homens", "Mulheres": "Mulheres"}),
+)
+
+# Indicadores em que o valor "total" grande não aparece no detalhe (só a tabela por categoria).
+BREAKDOWNS_WITHOUT_TOTAL = {
+    "Obitos por algumas causas de morte (%)",
+    "Ganho médio mensal dos trabalhadores por conta de outrem: total e por sexo",
+}
+
+
+def update_breakdowns(values_by_name: dict, report: list[dict]) -> None:
+    """Lê os ficheiros da Pordata de BREAKDOWNS (nacionalidade, sexo) e guarda em `breakdown` o nº de pessoas
+    por categoria e território (usado na tabela do detalhe do indicador) e em `breakdownLabel` o rótulo.
+    Para cada categoria usa o ano mais recente com dados nos 11 territórios (a Pordata deixa alguns valores a 0
+    nos anos mais recentes). Se falhar, mantém o `breakdown` anterior e regista o motivo em `report`."""
+    for name, file_name, label_kind, renames in BREAKDOWNS:
+        try:
+            rows, territory_rows, year_by_column = read_pordata_layout(PORDATA_DIRECTORY / file_name)
+            year_row = next(i for i, row in enumerate(rows) if row and normalized(row[0]) == "ambito geografico")
+            # Linha com os nomes das categorias: a 1.ª não vazia acima da linha dos anos (pode haver linhas em branco).
+            group_row = next(rows[i] for i in range(year_row - 1, -1, -1) if any(c >= 2 and v not in (None, "") for c, v in enumerate(rows[i])))
+            starts = [(column, str(label).strip()) for column, label in enumerate(group_row) if column >= 2 and label not in (None, "")]
+            items = []
+            for index, (start, label) in enumerate(starts):
+                if normalized(label) == "total":
+                    continue
+                end = starts[index + 1][0] if index + 1 < len(starts) else len(rows[year_row])
+                by_year: dict[int, dict[str, float | int]] = {}
+                for column in range(start, end):
+                    year = year_by_column.get(column)
+                    if year is None:
+                        continue
+                    for territory, row_index in territory_rows.items():
+                        value = as_number(rows[row_index][column]) if column < len(rows[row_index]) else None
+                        if value is not None:
+                            by_year.setdefault(year, {})[territory] = value
+                valid = [y for y in sorted(by_year) if len(by_year[y]) == len(TERRITORIES) and by_year[y].get("Alto Minho", 0) > 0]
+                if valid:
+                    items.append({"name": renames.get(label, label), "year": str(valid[-1]), "values": {t: by_year[valid[-1]][t] for t in TERRITORIES}})
+            if not items:
+                raise ValueError("nenhuma categoria encontrada")
+            values_by_name[name]["breakdown"] = items
+            values_by_name[name]["breakdownLabel"] = label_kind
+            values_by_name[name]["breakdownHideTotal"] = name in BREAKDOWNS_WITHOUT_TOTAL
+            unit = str(values_by_name[name].get("unit") or "pessoas")
+            values_by_name[name]["breakdownColumn"] = "%" if values_by_name[name].get("suffix") == "%" else unit[:1].upper() + unit[1:]
+            report.append({"indicator": f"{name} (por {label_kind})", "source": "Pordata", "status": "updated", "categories": len(items)})
+        except Exception as error:
+            report.append({"indicator": f"{name} (por {label_kind})", "source": "Pordata", "status": "kept-breakdown", "reason": str(error)})
+
+
+def ensure_catalog_entries(values_by_name: dict) -> int:
+    """Acrescenta ao catalog-data.js os indicadores novos de PORDATA_FIXED_ENTRIES que ainda não existem
+    (só depois de os valores terem passado a validação, para o site nunca mostrar indicadores sem dados).
+    Devolve quantos foram acrescentados."""
+    catalog = read_javascript_object(CATALOG_PATH, "indicatorCatalog")
+    existing = {item["name"] for item in catalog}
+    sources = json.loads(PORDATA_SOURCES_PATH.read_text(encoding="utf-8"))
+    added = 0
+    for name, entry in PORDATA_FIXED_ENTRIES.items():
+        if "catalog" not in entry or name in existing or name not in values_by_name:
+            continue
+        domain, theme, category = entry["catalog"]
+        catalog.append({"name": name, "domain": domain, "theme": theme, "category": category,
+                        "source": "Pordata", "url": sources[name], "year": values_by_name[name]["year"]})
+        added += 1
+    if added:
+        write_javascript_object(CATALOG_PATH, "Catálogo da matriz intermunicipal e ligações permanentes das fontes.", "indicatorCatalog", catalog)
+    return added
 
 
 def update_catalog_links() -> None:
@@ -604,8 +642,6 @@ def update_catalog_links() -> None:
         if item["name"] in INE_DIRECT:
             code = INE_DIRECT[item["name"]]["code"]
             item["url"] = f"https://www.ine.pt/xportal/xmain?xpid=INE&xpgid=ine_indicadores&indOcorrCod={code}&contexto=bd&selTab=tab2"
-        if item["name"] == "Diferença salarial H/M (%)":
-            item["url"] = "https://www.ine.pt/xportal/xmain?xpid=INE&xpgid=ine_indicadores&indOcorrCod=0012649&contexto=bd&selTab=tab2"
         if item["name"] == "Pop. Estrangeira c/ estatuto residente":
             item["source"] = "Pordata"
             item["url"] = sources["População estrangeira com estatuto legal de residente: total e por algumas nacionalidades"]
@@ -693,15 +729,16 @@ def main() -> None:
     expected_pordata = len(json.loads(PORDATA_SOURCES_PATH.read_text(encoding="utf-8")))
     report: list[dict] = []
     pordata_count = update_pordata(values_by_name, report)
+    update_breakdowns(values_by_name, report)
     ine_count = update_ine(values_by_name, report)
-    pordata_count += update_salary_difference(values_by_name, report)
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if pordata_count != expected_pordata:
         failures = [entry for entry in report if entry["source"] == "Pordata" and entry["status"] == "kept"]
         raise RuntimeError(f"Só {pordata_count} de {expected_pordata} indicadores Pordata passaram a validação. Falhas: {failures}")
-    if ine_count != 6:
+    if ine_count != len(INE_DIRECT):
         raise RuntimeError(f"Só {ine_count} indicadores INE passaram a validação")
+    ensure_catalog_entries(values_by_name)
     catalog_names = {item["name"] for item in read_javascript_object(CATALOG_PATH, "indicatorCatalog")}
     for stale in [key for key in values_by_name if key not in catalog_names]:
         del values_by_name[stale]
