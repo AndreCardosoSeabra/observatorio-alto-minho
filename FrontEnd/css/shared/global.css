@@ -352,3 +352,15 @@ body[data-page="metodologia"] .page-workspace {
 .line-tip strong { display: block; margin-bottom: 6px; color: var(--forest); }
 .line-tip div { display: flex; justify-content: space-between; gap: 14px; padding: 1px 0; }
 .line-tip div.sel { font-weight: 700; color: var(--forest); }
+
+/* Rodapé */
+.site-footer { margin-left: var(--rail); padding: 28px 40px; background: #fff; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; }
+.footer-logo { height: 44px; width: auto; }
+.footer-mail { color: var(--ink); font-size: 14px; text-decoration: none; }
+.footer-mail:hover { color: var(--blue-ink); text-decoration: underline; }
+.footer-social { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
+.footer-social a { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #e6effa; color: var(--blue-ink); transition: .2s ease; }
+.footer-social a:hover { background: var(--blue-ink); color: #fff; }
+.footer-social svg { width: 18px; height: 18px; fill: currentColor; }
+body.powerbi-embedded .site-footer { display: none; }
+@media (max-width: 760px) { .site-footer { margin-left: 0; padding: 24px 18px; flex-direction: column; align-items: flex-start; } }
