@@ -338,14 +338,35 @@ def update_ine(values_by_name: dict, report: list[dict]) -> int:
     Para cada um: grava o ano completo mais recente e o histórico dos anos anteriores. Se o INE só tiver um ano
     mais antigo do que o já guardado, mantém o valor atual. Regista o resultado em `report` e devolve quantos indicadores foram validados."""
     updated = 0
-    cache: dict[str, dict] = {}
-    for name, config in INE_DIRECT.items():
-        code = config["code"]
-        if code not in cache:
+    cache: dict[str, dict | None] = {}
+    codes = list(dict.fromkeys(config["code"] for config in INE_DIRECT.values()))
+
+    def fetch_code(code: str) -> None:
+        try:
             payload = fetch_json(f"https://www.ine.pt/ine/json_indicador/pindica.jsp?op=2&varcd={code}&lang=PT")
             if not isinstance(payload, list) or not payload or not payload[0].get("Sucesso", {}).get("Verdadeiro"):
                 raise ValueError(f"INE {code}: resposta inválida")
             cache[code] = payload[0]
+        except Exception as error:  # fonte instável: tenta de novo no fim
+            cache[code] = None
+            print(f"AVISO: INE {code} falhou ({str(error)[:150]})")
+
+    for code in codes:
+        fetch_code(code)
+    for wait_seconds in (30, 60, 120):
+        pending = [code for code in codes if cache[code] is None]
+        if not pending:
+            break
+        print(f"A repetir {len(pending)} indicadores INE em falta dentro de {wait_seconds} segundos: {', '.join(pending)}")
+        time.sleep(wait_seconds)
+        for code in pending:
+            fetch_code(code)
+
+    for name, config in INE_DIRECT.items():
+        code = config["code"]
+        if cache[code] is None:
+            report.append({"indicator": name, "source": "INE", "status": "kept", "reason": "source unavailable"})
+            continue
         year, rows = rows_for_latest_complete_year(cache[code], config["filters"])
         current_year = int(values_by_name[name]["year"])
         if int(year) < current_year:
@@ -740,8 +761,10 @@ def main() -> None:
     if pordata_count != expected_pordata:
         failures = [entry for entry in report if entry["source"] == "Pordata" and entry["status"] == "kept"]
         raise RuntimeError(f"Só {pordata_count} de {expected_pordata} indicadores Pordata passaram a validação. Falhas: {failures}")
+    if ine_count == 0:
+        raise RuntimeError("Nenhum indicador INE foi obtido; a fonte está indisponível")
     if ine_count != len(INE_DIRECT):
-        raise RuntimeError(f"Só {ine_count} indicadores INE passaram a validação")
+        print(f"AVISO: {len(INE_DIRECT) - ine_count} indicadores INE mantidos por falha da fonte.")
     ensure_catalog_entries(values_by_name)
     catalog_names = {item["name"] for item in read_javascript_object(CATALOG_PATH, "indicatorCatalog")}
     for stale in [key for key in values_by_name if key not in catalog_names]:
