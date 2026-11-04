@@ -1,0 +1,39 @@
+Valor selecionado =
+SUM ( Indicadores[Valor] )
+
+Ano mais recente =
+MAX ( Indicadores[Ano] )
+
+Valor Alto Minho =
+CALCULATE (
+    [Valor selecionado],
+    REMOVEFILTERS ( Indicadores[Territorio], Indicadores[TipoTerritorio] ),
+    Indicadores[Territorio] = "Alto Minho"
+)
+
+Diferença face ao Alto Minho =
+[Valor selecionado] - [Valor Alto Minho]
+
+Diferença percentual face ao Alto Minho =
+DIVIDE ( [Diferença face ao Alto Minho], [Valor Alto Minho] )
+
+Posição municipal =
+IF (
+    SELECTEDVALUE ( Indicadores[TipoTerritorio] ) = "Município",
+    RANKX (
+        FILTER (
+            ALLSELECTED ( Indicadores[Territorio], Indicadores[TipoTerritorio] ),
+            Indicadores[TipoTerritorio] = "Município"
+        ),
+        [Valor selecionado],
+        ,
+        DESC,
+        DENSE
+    )
+)
+
+Municípios disponíveis =
+CALCULATE (
+    DISTINCTCOUNT ( Indicadores[Territorio] ),
+    Indicadores[TipoTerritorio] = "Município"
+)
