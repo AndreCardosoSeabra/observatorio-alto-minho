@@ -1,0 +1,14 @@
+import { chromium } from "playwright";
+import { mkdir, writeFile } from "node:fs/promises";
+const id = process.env.PORDATA_ONLY_ID || "458";
+const dir = ".cache/pordata-debug";
+await mkdir(dir, { recursive: true });
+const browser = await chromium.launch({ headless: true });
+const page = await browser.newPage({ viewport: { width: 1400, height: 1000 } });
+await page.goto(`https://www.pordata.pt/db/municipios/ambiente+de+consulta/tabela/?microid=${id}`, { waitUntil: "networkidle", timeout: 90000 });
+await page.getByRole("button", { name: /rejeitar/i }).first().click({ timeout: 8000 }).catch(() => {});
+await page.waitForTimeout(2000);
+await writeFile(`${dir}/tabela-${id}.html`, await page.content());
+await page.screenshot({ path: `${dir}/tabela-${id}.png`, fullPage: true });
+console.log("OK: ", `${dir}/tabela-${id}.html e .png`);
+await browser.close();

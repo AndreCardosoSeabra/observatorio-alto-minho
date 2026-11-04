@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Observatório territorial da CIM Alto Minho com indicadores municipais do INE e da Pordata.">
+  <title>Comparação municipal | Observatório Alto Minho</title>
+  <link rel="icon" type="image/svg+xml" href="../imgs/favicon.svg">
+  <!-- Estilos globais -->
+  <link rel="stylesheet" href="../css/shared/global.css">
+  <!-- Estilos da página -->
+  <link rel="stylesheet" href="../css/pages/comparar.css">
+</head>
+<body data-page="comparar">
+  <!-- Cabeçalho e navegação -->
+  <header class="rail">
+    <a class="brand" href="../../index.html" aria-label="Observatório Alto Minho — início">
+      <span class="brand-symbol" aria-hidden="true"><img src="../imgs/cim-alto-minho.svg" alt=""></span>
+      <span><b>Alto Minho</b><small>Observatório territorial</small></span>
+    </a>
+    <div class="rail-territory">
+      <label for="territory-select">Território em análise</label>
+      <select id="territory-select" aria-label="Escolha o território"></select>
+      <p>10 municípios · NUTS III Alto Minho</p>
+    </div>
+    <nav aria-label="Navegação principal">
+      <a href="../../index.html"><span>01</span>Retrato</a>
+      <a href="./indicadores.html"><span>02</span>Indicadores</a>
+      <a class="active" aria-current="page" href="./comparar.html"><span>03</span>Comparar</a>
+      <a href="./metodologia.html"><span>04</span>Metodologia</a>
+      <a href="./transferencias.html"><span>05</span>Documentos</a>
+      <a href="./forms.html"><span>06</span>Respostas</a>
+    </nav>
+    <div class="rail-note">
+      <span class="source-dot"></span>
+      <p>Dados estatísticos<br><strong>INE · Pordata</strong></p>
+    </div>
+  </header>
+
+  <!-- Conteúdo principal -->
+  <main id="top">
+    <section class="workspace page-workspace">
+      <div class="page-intro">
+        <div>
+          <p class="overline">03 · Comparar</p>
+          <h1>Comparação municipal</h1>
+          <p>Compare os dez municípios do Alto Minho num indicador e veja como evoluiu ao longo dos anos.</p>
+        </div>
+      </div>
+
+      <section class="card" id="comparar">
+        <div class="card-head">
+          <div><p class="overline">Gráfico 1</p><h2>Valor por município</h2></div>
+          <label class="compare-control">Indicador a comparar
+            <select id="compare-indicator" aria-label="Indicador a comparar"></select>
+          </label>
+        </div>
+        <div class="chart" id="comparison-chart" aria-label="Comparação dos municípios"></div>
+      </section>
+
+      <section class="card" id="evolucao">
+        <div class="card-head">
+          <div><p class="overline">Gráfico 2</p><h2>Evolução ao longo dos anos</h2></div>
+          <form class="year-filter" id="year-filter">
+            <label>Ano inicial<select id="year-from"></select></label>
+            <label>Ano final<select id="year-to"></select></label>
+            <button type="submit">Aplicar</button>
+          </form>
+        </div>
+        <div class="history-chart" id="year-chart"></div>
+      </section>
+    </section>
+  </main>
+  <!-- Dados gerados -->
+  <script src="../js/data/catalog-data.js"></script>
+  <script src="../js/data/indicator-values.js"></script>
+  <script src="../js/data/map-data.js"></script>
+  <!-- Núcleo partilhado -->
+  <script src="../js/shared/app.js"></script>
+  <!-- Lógica da página -->
+  <script src="../js/pages/comparar.js"></script>
+  <!-- Power BI -->
+  <script src="../js/shared/powerbi-config.js"></script>
+  <script src="../js/shared/powerbi-embed.js"></script>
+</body>
+</html>

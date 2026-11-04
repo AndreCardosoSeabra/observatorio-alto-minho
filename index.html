@@ -5,104 +5,83 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Observatório territorial da CIM Alto Minho com indicadores municipais do INE e da Pordata.">
   <title>Retrato territorial | Observatório Alto Minho</title>
-  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="icon" type="image/svg+xml" href="./FrontEnd/imgs/favicon.svg">
+  <!-- Estilos globais -->
+  <link rel="stylesheet" href="./FrontEnd/css/shared/global.css">
+  <!-- Estilos da página -->
+  <link rel="stylesheet" href="./FrontEnd/css/pages/index.css">
 </head>
 <body data-page="retrato">
+  <!-- Cabeçalho e navegação -->
   <header class="rail">
     <a class="brand" href="./index.html" aria-label="Observatório Alto Minho — início">
-      <span class="brand-symbol" aria-hidden="true"><img src="./cim-alto-minho.svg" alt=""></span>
+      <span class="brand-symbol" aria-hidden="true"><img src="./FrontEnd/imgs/cim-alto-minho.svg" alt=""></span>
       <span><b>Alto Minho</b><small>Observatório territorial</small></span>
     </a>
+    <div class="rail-territory">
+      <label for="territory-select">Território em análise</label>
+      <select id="territory-select" aria-label="Escolha o território"></select>
+      <p>10 municípios · NUTS III Alto Minho</p>
+    </div>
     <nav aria-label="Navegação principal">
       <a class="active" aria-current="page" href="./index.html"><span>01</span>Retrato</a>
-      <a href="./indicadores.html"><span>02</span>Indicadores</a>
-      <a href="./comparar.html"><span>03</span>Comparar</a>
-      <a href="./metodologia.html"><span>04</span>Metodologia</a>
+      <a href="./FrontEnd/html/indicadores.html"><span>02</span>Indicadores</a>
+      <a href="./FrontEnd/html/comparar.html"><span>03</span>Comparar</a>
+      <a href="./FrontEnd/html/metodologia.html"><span>04</span>Metodologia</a>
+      <a href="./FrontEnd/html/transferencias.html"><span>05</span>Documentos</a>
+      <a href="./FrontEnd/html/forms.html"><span>06</span>Respostas</a>
     </nav>
     <div class="rail-note">
       <span class="source-dot"></span>
       <p>Dados estatísticos<br><strong>INE · Pordata</strong></p>
     </div>
-    <a class="source-link" href="./indicadores.html">Consultar catálogo <span>→</span></a>
   </header>
 
+  <!-- Conteúdo principal -->
   <main id="top">
     <section class="workspace" id="retrato">
       <div class="page-intro">
         <div>
-          <p class="overline">CIM Alto Minho · retrato territorial</p>
-          <h1>Conhecer o território.<br><em>Decidir com contexto.</em></h1>
-        </div>
-        <div class="territory-picker">
-          <label for="territory-select">Território em análise</label>
-          <select id="territory-select" aria-label="Escolha o território"></select>
-          <p>10 municípios · NUTS III Alto Minho</p>
+          <p class="overline">01 · Retrato</p>
+          <h1>Retrato do Alto Minho</h1>
         </div>
       </div>
 
+      <!-- Alto Minho em números (preenchido por index.js) -->
+      <section class="kpi-strip" id="kpi-strip" aria-label="Alto Minho em números"></section>
+
       <div class="territory-title-row">
-        <div><span>Território selecionado</span><h2 id="territory-title">Alto Minho</h2></div>
-        <p><i></i> Matriz de indicadores do projeto · fontes INE e Pordata</p>
+        <div><span>Território selecionado:</span><h2 id="territory-title">Alto Minho</h2></div>
       </div>
 
       <div class="territory-stage">
         <section class="map-panel" aria-label="Mapa dos municípios do Alto Minho">
           <div class="map-caption">
             <span>Mapa municipal</span>
-            <p>Selecione um município para explorar os seus indicadores.</p>
+            <p>Selecione um município para começar a explorar os seus indicadores.</p>
           </div>
           <svg class="region-map" viewBox="0 0 520 390" role="img" aria-labelledby="map-title map-description">
             <title id="map-title">Mapa interativo dos dez municípios do Alto Minho</title>
             <desc id="map-description">Limites administrativos dos municípios da Comunidade Intermunicipal do Alto Minho.</desc>
             <g id="map-nodes"></g>
           </svg>
-          <div class="map-key"><span></span> Município ativo <small>Limites: CAOP · DGT</small></div>
-        </section>
-
-        <section class="metric-panel" aria-label="Indicadores de síntese">
-          <div class="metric-heading">
-            <p>Indicadores de síntese</p>
-            <span>Último ano disponível</span>
-          </div>
-          <div class="kpis" id="kpi-grid" aria-live="polite"></div>
+          <div class="map-key"><div><span></span> Município ativo <small>Limites: CAOP · DGT</small></div><small class="map-sources">Fontes: INE e PORDATA</small></div>
         </section>
       </div>
 
-      <section class="themes" aria-labelledby="themes-title">
-        <div class="section-index">01</div>
-        <div class="section-copy">
-          <p class="overline">Áreas de observação</p>
-          <h2 id="themes-title">Escolha uma perspetiva</h2>
-        </div>
-        <div class="theme-tabs" role="tablist" aria-label="Áreas temáticas">
-          <button class="theme active" role="tab" aria-selected="true" data-theme="Demografia">Demografia</button>
-          <button class="theme" role="tab" aria-selected="false" data-theme="Habitação">Habitação</button>
-          <button class="theme" role="tab" aria-selected="false" data-theme="Emprego">Emprego</button>
-          <button class="theme" role="tab" aria-selected="false" data-theme="Educação">Educação</button>
-          <button class="theme" role="tab" aria-selected="false" data-theme="Saúde">Saúde</button>
-          <button class="theme" role="tab" aria-selected="false" data-theme="Coesão social">Coesão social</button>
-        </div>
-      </section>
-
-      <section class="theme-overview" id="panorama-tematico">
-        <div class="overview-copy">
-          <p class="overline" id="theme-kicker">Área de Demografia</p>
-          <h2 id="theme-title">Estrutura e dinâmica da população</h2>
-          <p id="theme-description">Leia a evolução demográfica e compare o território com o Alto Minho.</p>
-        </div>
-        <div class="indicator-cards" id="indicator-cards"></div>
-      </section>
     </section>
   </main>
-  <script src="./catalog-data.js"></script>
-  <script src="./indicator-values.js"></script>
-  <script src="./map-data.js"></script>
-  <script src="./app.js"></script>
-  <script src="./powerbi-config.js"></script>
-  <script src="./powerbi-embed.js"></script>
+  <!-- Dados gerados -->
+  <script src="./FrontEnd/js/data/catalog-data.js"></script>
+  <script src="./FrontEnd/js/data/indicator-values.js"></script>
+  <script src="./FrontEnd/js/data/map-data.js"></script>
+  <!-- Núcleo partilhado -->
+  <script src="./FrontEnd/js/shared/app.js"></script>
+  <!-- Lógica da página -->
+  <script src="./FrontEnd/js/pages/municipio.js"></script>
+  <script src="./FrontEnd/js/pages/index.js"></script>
+  <!-- Power BI -->
+  <script src="./FrontEnd/js/shared/powerbi-config.js"></script>
+  <script src="./FrontEnd/js/shared/powerbi-embed.js"></script>
 </body>
 </html>

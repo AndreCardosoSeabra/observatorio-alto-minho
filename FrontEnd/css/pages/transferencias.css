@@ -1,0 +1,74 @@
+/* Página Documentos: cartões de documentos e ajustes */
+/* Documentos */
+body[data-page="transferencias"] .doc-grid { padding-top: 8px; }
+.doc-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 22px; background: #fff; border: 1px solid var(--line); }
+.doc-thumb { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--paper); }
+.doc-body { display: flex; flex-direction: column; gap: 10px; padding: 22px; flex: 1; }
+.doc-body h3 { margin: 0; font-family: var(--font-title); font-weight: 400; font-size: 24px; line-height: 1.1; color: var(--forest); }
+.doc-body p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.doc-btn { align-self: flex-start; margin-top: auto; display: inline-flex; align-items: center; min-height: 44px; padding: 0 24px; border-radius: 999px; background: var(--forest); color: var(--lime); font-size: 14px; font-weight: 600; text-decoration: none; }
+.doc-btn:hover { background: var(--forest-2); }
+
+/* Página Transferências: ajustes sobre o styles.css */
+
+/* O .workspace já dá 52px no topo, por isso o .themes não precisa dos seus 58px */
+body[data-page="transferencias"] .themes {
+  padding-top: 0;
+}
+
+/* Telemóvel: o .workspace passa a 34px e o .themes tinha 42px */
+@media (max-width: 900px) {
+  body[data-page="transferencias"] .themes {
+    padding-top: 0;
+  }
+}
+
+.doc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  padding-top: 40px;
+}
+
+/* Ecrãs médios: 2 por linha */
+@media (max-width: 1100px) {
+  .doc-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Telemóvel: 1 por linha */
+@media (max-width: 640px) {
+  .doc-grid { grid-template-columns: 1fr; }
+}
+
+.doc-card {
+  position: relative;           
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.doc-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .08);
+}
+
+.doc-thumb {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.doc-body { padding: 20px 22px 24px; }
+.doc-body h3 { margin: 0 0 10px; font-size: 24px; line-height: 1.15; }
+.doc-body h3 a { color: inherit; text-decoration: none; }
+.doc-body h3 a:hover { color: var(--coral); }
+.doc-body p { margin: 0; }
+
+/* Faz com que o clique em qualquer parte do cartão descarregue o ficheiro */
+.doc-body h3 a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
