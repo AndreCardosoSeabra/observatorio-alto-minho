@@ -4,7 +4,7 @@ O site é publicado pelo GitHub Pages em [sistemainformacaocimaltominho.pt](http
 
 ## Atualização automática dos dados
 
-O workflow `Atualizar dados estatísticos` corre todas as segundas-feiras e também pode ser iniciado manualmente no separador **Actions** do GitHub. O processo:
+O workflow `Atualizar dados estatísticos` corre todas as segundas-feiras. O processo:
 
 1. consulta a API oficial do INE;
 2. exporta os ficheiros Excel oficiais da Pordata;
@@ -18,14 +18,17 @@ O INE bloqueia ligações diretas provenientes dos servidores partilhados do Git
 
 Os endereços permanentes usados para cada indicador Pordata estão em `data/pordata-sources.json`. Os indicadores do INE e as respetivas dimensões estão definidos em `scripts/update-data.py`.
 
+### Executar a atualização manualmente
+
+1. Abra o repositório no GitHub.
+2. Entre no separador **Actions**.
+3. Na coluna esquerda, selecione **Atualizar dados estatísticos**.
+4. Clique em **Run workflow**.
+5. Mantenha a branch `main` selecionada e clique novamente em **Run workflow**.
+6. Abra a nova execução para acompanhar cada etapa.
+
+O processo demora normalmente entre 15 e 20 minutos. Se não existirem valores novos, termina com sucesso sem criar um commit. Se existirem dados novos e todas as validações passarem, o próprio workflow atualiza os ficheiros e publica o site.
+
 ## Alterações ao site
 
 Os textos e a estrutura visual podem ser editados diretamente em `index.html`, `styles.css` e `app.js`. As listas de indicadores e fontes ficam em `catalog-data.js`; os valores são geridos automaticamente e não devem ser alterados manualmente em `indicator-values.js`.
-
-O ficheiro `powerbi-data.csv` contém os mesmos dados num formato preparado para ligação direta pelo Power BI. É regenerado e publicado pelo workflow sempre que os indicadores são atualizados.
-
-## Mostrar o dashboard do Power BI no site
-
-O site está preparado para apresentar diretamente o relatório do Power BI em ecrã completo. Depois de publicar o relatório no Power BI Service, copie o endereço de incorporação e coloque-o no campo `embedUrl` do ficheiro `powerbi-config.js`.
-
-Enquanto esse campo estiver vazio, o site mantém automaticamente a versão HTML atual. Para um site público sem início de sessão, o endereço deve ser criado em **Ficheiro > Incorporar relatório > Publicar na Web (público)**. Esta opção só deve ser usada para informação que possa ficar acessível a qualquer pessoa.
