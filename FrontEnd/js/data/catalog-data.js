@@ -321,7 +321,7 @@ const indicatorCatalog = [
     "theme": "Estrutura",
     "category": "Tipologia",
     "source": "INE",
-    "url": "https://www.ine.pt/",
+    "url": "https://www.ine.pt/xportal/xmain?xpid=INE&xpgid=ine_indicadores&indOcorrCod=0012405&contexto=bd&selTab=tab2",
     "year": ""
   },
   {

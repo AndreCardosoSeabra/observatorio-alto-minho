@@ -9785,17 +9785,32 @@ const indicatorValuesByName = {
     "prefix": "",
     "suffix": "",
     "values": {
-      "Alto Minho": 11282,
-      "Arcos de Valdevez": 972,
-      "Caminha": 872,
       "Melgaço": 421,
-      "Monção": 917,
       "Paredes de Coura": 337,
-      "Ponte da Barca": 579,
-      "Ponte de Lima": 1802,
-      "Valença": 795,
       "Viana do Castelo": 4174,
-      "Vila Nova de Cerveira": 413
+      "Ponte de Lima": 1802,
+      "Ponte da Barca": 579,
+      "Vila Nova de Cerveira": 413,
+      "Monção": 917,
+      "Caminha": 872,
+      "Alto Minho": 11282,
+      "Valença": 795,
+      "Arcos de Valdevez": 972
+    },
+    "history": {
+      "2021": {
+        "Melgaço": 421,
+        "Paredes de Coura": 337,
+        "Viana do Castelo": 4174,
+        "Ponte de Lima": 1802,
+        "Ponte da Barca": 579,
+        "Vila Nova de Cerveira": 413,
+        "Monção": 917,
+        "Caminha": 872,
+        "Alto Minho": 11282,
+        "Valença": 795,
+        "Arcos de Valdevez": 972
+      }
     }
   },
   "Proporção de pop. residente em movimentos pendulares": {
