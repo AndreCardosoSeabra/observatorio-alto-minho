@@ -74,6 +74,8 @@ body[data-page="transferencias"] { --paper: #c4d8ef; }
 .rail nav a:nth-child(4n+2) { --tc: #c0332b; --tb: #fbe7e4; }
 .rail nav a:nth-child(4n+3) { --tc: #8a680c; --tb: #fcf4d8; }
 .rail nav a:nth-child(4n+4) { --tc: #2e7d46; --tb: #e4f2e8; }
+.rail nav a[href$="transferencias.html"] { --tc: #1f5fae; --tb: #e6effa; }
+.rail nav a[href$="forms.html"] { --tc: #c0332b; --tb: #fbe7e4; }
 .rail nav a {
   color: var(--tc);
   border-radius: 6px;
@@ -364,3 +366,9 @@ body[data-page="metodologia"] .page-workspace {
 .footer-social svg { width: 18px; height: 18px; fill: currentColor; }
 body.powerbi-embedded .site-footer { display: none; }
 @media (max-width: 760px) { .site-footer { margin-left: 0; padding: 24px 18px; flex-direction: column; align-items: flex-start; } }
+/* Modo admin provisório (botão no fundo da barra lateral) */
+.admin-toggle { margin-top: 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; transition: .2s ease; }
+.admin-toggle b { font-weight: 600; color: var(--ink); }
+.admin-toggle.on { border-color: #2e7d46; background: #e4f2e8; }
+.admin-toggle.on b { color: #2e7d46; }
+body:not([data-admin="on"]) #drop, body:not([data-admin="on"]) #clear { display: none !important; }

@@ -31,3 +31,12 @@
 .matrix tr:last-child td { font-weight: 700; border-bottom: 0; }
 .matrix td.yes { color: #3a8458; }
 .matrix td.no { color: #c4564d; }
+.matrix td.na { color: #9aa6b8; }
+
+/* Projetos realizados / não realizados por município */
+.proj { margin-top: 14px; font-size: 13px; }
+.proj h4 { margin: 0 0 6px; font-size: 13px; }
+.proj ul { margin: 0; padding-left: 18px; color: var(--muted); }
+.proj.yes h4 { color: #3a8458; }
+.proj.no h4 { color: #c4564d; }
+.proj.na h4 { color: #667790; }

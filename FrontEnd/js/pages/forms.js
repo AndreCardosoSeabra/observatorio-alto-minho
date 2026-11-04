@@ -12,12 +12,22 @@ drop.addEventListener('click', () => fileInput.click());
 ['dragleave','drop'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove('over'); }));
 drop.addEventListener('drop', ev => { if (ev.dataTransfer.files[0]) load(ev.dataTransfer.files[0]); });
 fileInput.addEventListener('change', () => { if (fileInput.files[0]) load(fileInput.files[0]); });
-document.getElementById('split').addEventListener('change', () => lastRows && render(lastRows));
-document.getElementById('maxopts').addEventListener('change', () => lastRows && render(lastRows));
+const terrSel = document.getElementById('territory-select');
+if (terrSel) terrSel.addEventListener('change', () => lastRows && safeRenderForms(lastRows));
 clearBtn.addEventListener('click', () => {
   destroy(); content.innerHTML = ''; msg.textContent = ''; lastRows = null; fileInput.value = ''; clearBtn.style.display = 'none';
+  try { localStorage.removeItem(STORE); } catch {}
 });
 
+// Provisório: os dados carregados pelo admin ficam guardados neste browser, para o modo utilizador os ver.
+const STORE = 'observatorio-metas';
+function saveRows(rows) { try { localStorage.setItem(STORE, JSON.stringify(rows)); } catch {} }
+function restoreRows() {
+  try { const r = JSON.parse(localStorage.getItem(STORE) || 'null'); if (Array.isArray(r) && r.length) { lastRows = r; safeRenderForms(r); return; } } catch {}
+  msg.className = ''; msg.textContent = 'Ainda não há metas carregadas.';
+}
+
+function safeRenderForms(r) { try { renderForms(r); } catch (e) { msg.className = 'err'; msg.textContent = 'Erro: ' + e.message; } }
 function destroy() { charts.forEach(c => c.destroy()); charts = []; }
 
 function load(file) {
@@ -30,8 +40,10 @@ function load(file) {
       const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
       if (!rows.length) throw new Error('Ficheiro sem respostas.');
       lastRows = rows;
-      render(rows);
+      saveRows(rows);
+      renderForms(rows);
     } catch (err) {
+      destroy(); content.innerHTML = ''; lastRows = null; clearBtn.style.display = 'none';
       msg.className = 'err'; msg.textContent = 'Erro: ' + err.message;
     }
   };
@@ -41,48 +53,12 @@ function load(file) {
 function isEmpty(v) { return v === '' || v === null || v === undefined || String(v).trim() === ''; }
 function isTimestamp(col) { return /carimbo|timestamp|data\/hora/i.test(col); }
 
-function render(rows) {
+function renderForms(rows) {
   destroy(); content.innerHTML = '';
-  const split = document.getElementById('split').checked;
-  const maxOpts = parseInt(document.getElementById('maxopts').value) || 12;
   const cols = Object.keys(rows[0]).filter(c => !isTimestamp(c));
-  const total = rows.length;
-
-  // Modo atividades: 1 linha por município, 1 coluna por atividade (Sim/Não)
   const act = detectActivities(rows, cols);
-  if (act) { renderActivities(rows, act); return; }
-
-  const grid = document.createElement('div'); grid.className = 'grid';
-  content.appendChild(grid);
-
-  const complete = rows.filter(r => cols.every(c => !isEmpty(r[c]))).length;
-  addDonut(grid, 'Respostas completas', ['Completas', 'Incompletas'], [complete, total - complete],
-    `<b>${complete}</b> de <b>${total}</b> completas`, ['#3a8458', '#ef9a93']);
-
-  const skipped = [];
-  cols.forEach(col => {
-    const counts = {};
-    let answered = 0;
-    rows.forEach(r => {
-      const v = r[col];
-      if (isEmpty(v)) return;
-      answered++;
-      const parts = split ? String(v).split(',').map(s => s.trim()).filter(Boolean) : [String(v).trim()];
-      parts.forEach(p => counts[p] = (counts[p] || 0) + 1);
-    });
-    const labels = Object.keys(counts);
-    if (!labels.length || labels.length > maxOpts) { skipped.push(col); return; }
-    labels.sort((a, b) => counts[b] - counts[a]);
-    addDonut(grid, col, labels, labels.map(l => counts[l]), `<b>${answered}</b> de <b>${total}</b> responderam`);
-  });
-
-  if (skipped.length) {
-    const s = document.createElement('div'); s.className = 'skipped';
-    s.textContent = 'Ignoradas (texto livre ou demasiadas opções): ' + skipped.join(' • ');
-    content.appendChild(s);
-  }
-  msg.className = ''; msg.textContent = `${total} respostas, ${cols.length} perguntas.`;
-  clearBtn.style.display = 'inline-block';
+  if (!act) throw new Error('Formato inválido. O ficheiro deve ter uma coluna "Município" e, no mínimo, 2 colunas de metas com respostas Sim/Não (1 linha por município).');
+  renderActivities(rows, act);
 }
 
 function addDonut(parent, title, labels, data, info, colors) {
@@ -107,9 +83,9 @@ function addDonut(parent, title, labels, data, info, colors) {
   charts.push(chart);
 }
 
-/* ---------- Modo atividades por município ---------- */
-const YES = /^(sim|s|yes|y|feito|feita|concluido|concluida|realizado|realizada|ok|x|1|true|✔|✓)$/;
-const NO = /^(nao|n|no|por fazer|pendente|nao feito|nao feita|em curso|0|false|✘|✗)$/;
+/* ---------- Modo metas por município ---------- */
+const YES = /^(sim|cumprida|cumprido|s|yes|y|feito|feita|concluido|concluida|realizado|realizada|ok|x|1|true|✔|✓)$/;
+const NO = /^(nao|por cumprir|nao cumprida|nao cumprido|n|no|por fazer|pendente|nao feito|nao feita|em curso|0|false|✘|✗)$/;
 function norm(v) { return String(v).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
 function isYes(v) { return YES.test(norm(v)); }
 function isYesNo(v) { const n = norm(v); return YES.test(n) || NO.test(n); }
@@ -129,18 +105,26 @@ function renderActivities(rows, { mcol, acts }) {
   const byMun = new Map();
   rows.forEach(r => { const m = String(r[mcol]).trim(); if (m) byMun.set(m, r); }); // última resposta prevalece
   const muns = [...byMun.keys()].sort((a, b) => a.localeCompare(b, 'pt'));
-  const doneOf = m => acts.filter(a => isYes(byMun.get(m)[a])).length;
-  const all = muns.length * acts.length;
+  // Célula vazia = município sem esse evento (não conta); Sim = cumprida; Não = por cumprir
+  const st = (m, a) => { const v = byMun.get(m)[a]; return isEmpty(v) ? null : (isYes(v) ? 'yes' : 'no'); };
+  const appOf = m => acts.filter(a => st(m, a) !== null);
+  const doneOf = m => acts.filter(a => st(m, a) === 'yes').length;
+  const all = muns.reduce((t, m) => t + appOf(m).length, 0);
   const done = muns.reduce((t, m) => t + doneOf(m), 0);
+
+  // Território em análise: um município filtra; "Alto Minho" mostra todos
+  const nk = x => norm(x);
+  const sel = muns.find(m => nk(m) === nk(selectedTerritory));
+  const shown = sel ? [sel] : muns;
 
   const grid = document.createElement('div'); grid.className = 'grid';
   content.appendChild(grid);
-  addDonut(grid, 'Total de atividades feitas', ['Feitas', 'Por fazer'], [done, all - done],
-    `<b>${done}</b> de <b>${all}</b> feitas`, ['#3a8458', '#ef9a93']);
-  muns.forEach(m => {
-    const d = doneOf(m);
-    addDonut(grid, m, ['Feitas', 'Por fazer'], [d, acts.length - d],
-      `<b>${d}</b> de <b>${acts.length}</b> atividades`, ['#3a8458', '#ef9a93']);
+  if (!sel) addDonut(grid, 'Total de metas cumpridas', ['Cumpridas', 'Por cumprir'], [done, all - done],
+    `<b>${done}</b> de <b>${all}</b> cumpridas`, ['#3a8458', '#ef9a93']);
+  shown.forEach(m => {
+    const d = doneOf(m), n = appOf(m).length;
+    addDonut(grid, m, ['Cumpridas', 'Por cumprir'], [d, n - d],
+      `<b>${d}</b> de <b>${n}</b> metas`, ['#3a8458', '#ef9a93']);
   });
 
   const wrap = document.createElement('div'); wrap.className = 'table-wrap';
@@ -154,16 +138,18 @@ function renderActivities(rows, { mcol, acts }) {
     });
     table.appendChild(tr);
   };
+  const sym = { yes: '✔', no: '✘', null: '–' };
   addRow(['Município', ...acts, 'Total'], 'th');
-  muns.forEach(m => {
-    const r = byMun.get(m);
-    const ys = acts.map(a => isYes(r[a]));
-    addRow([m, ...ys.map(y => y ? '✔' : '✘'), `${doneOf(m)}/${acts.length}`], 'td', ['', ...ys.map(y => y ? 'yes' : 'no')]);
+  shown.forEach(m => {
+    const ss = acts.map(a => st(m, a));
+    addRow([m, ...ss.map(s => sym[s]), `${doneOf(m)}/${appOf(m).length}`], 'td', ['', ...ss.map(s => s || 'na')]);
   });
-  addRow(['Total', ...acts.map(a => `${muns.filter(m => isYes(byMun.get(m)[a])).length}/${muns.length}`), `${done}/${all}`], 'td');
+  if (!sel) addRow(['Total', ...acts.map(a => `${muns.filter(m => st(m, a) === 'yes').length}/${muns.filter(m => st(m, a) !== null).length}`), `${done}/${all}`], 'td');
   wrap.appendChild(table);
   content.appendChild(wrap);
 
-  msg.className = ''; msg.textContent = `${muns.length} municípios, ${acts.length} atividades.`;
+  msg.className = ''; msg.textContent = sel ? `${sel}: ${appOf(sel).length} de ${acts.length} metas.` : `${muns.length} municípios, ${acts.length} metas.`;
   clearBtn.style.display = 'inline-block';
 }
+
+restoreRows();

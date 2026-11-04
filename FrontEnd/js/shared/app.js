@@ -692,3 +692,27 @@ renderCategoryButtons(); renderCatalog(); setTerritory(selectedTerritory);
   const main = document.querySelector("main");
   main ? main.after(el) : document.body.appendChild(el);
 })();
+
+// ===== 9. MODO ADMIN (provisório) =====
+// Botão no fundo da barra lateral. ON = admin (pode carregar ficheiros); OFF = utilizador (só vê).
+// Guardado no localStorage. Provisório: ainda não há login a sério.
+(function adminToggle() {
+  const rail = document.querySelector(".rail");
+  if (!rail) return;
+  const read = () => { try { return localStorage.getItem("observatorio-admin") === "on"; } catch { return false; } };
+  const btn = document.createElement("button");
+  btn.type = "button"; btn.className = "admin-toggle";
+  const apply = on => {
+    document.body.dataset.admin = on ? "on" : "off";
+    btn.classList.toggle("on", on);
+    btn.setAttribute("aria-pressed", String(on));
+    btn.innerHTML = `<span>Modo admin (provisório)</span><b>${on ? "on" : "off"}</b>`;
+  };
+  btn.addEventListener("click", () => {
+    const on = document.body.dataset.admin !== "on";
+    try { localStorage.setItem("observatorio-admin", on ? "on" : "off"); } catch {}
+    apply(on);
+  });
+  apply(read());
+  rail.appendChild(btn);
+})();
