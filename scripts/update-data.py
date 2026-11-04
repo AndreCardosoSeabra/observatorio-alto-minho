@@ -91,6 +91,12 @@ INE_DIRECT = {
     "Rendimento médio": {"code": "0012649", "filters": {"dim_3": "TOT", "dim_4": "T"}},
     "Taxa de analfabetismo": {"code": "0012273", "filters": {"dim_3": "T"}},
     "Proporção de pop. residente em movimentos pendulares": {"code": "0011655", "filters": {}},
+    # Indicador grande: o INE exige o período (Dim1) e os territórios (Dim2) no pedido.
+    "% famílias monoparentais": {
+        "code": "0012405",
+        "filters": {"dim_3": "T", "dim_4": "T", "dim_5": "T"},
+        "query": "&Dim1=S7A2021&Dim2=111,1601,1602,1603,1604,1605,1606,1607,1608,1609,1610",
+    },
 }
 
 
@@ -341,9 +347,11 @@ def update_ine(values_by_name: dict, report: list[dict]) -> int:
     cache: dict[str, dict | None] = {}
     codes = list(dict.fromkeys(config["code"] for config in INE_DIRECT.values()))
 
+    extra_query = {config["code"]: config.get("query", "") for config in INE_DIRECT.values()}
+
     def fetch_code(code: str) -> None:
         try:
-            payload = fetch_json(f"https://www.ine.pt/ine/json_indicador/pindica.jsp?op=2&varcd={code}&lang=PT")
+            payload = fetch_json(f"https://www.ine.pt/ine/json_indicador/pindica.jsp?op=2&varcd={code}{extra_query[code]}&lang=PT")
             if not isinstance(payload, list) or not payload or not payload[0].get("Sucesso", {}).get("Verdadeiro"):
                 raise ValueError(f"INE {code}: resposta inválida")
             cache[code] = payload[0]
