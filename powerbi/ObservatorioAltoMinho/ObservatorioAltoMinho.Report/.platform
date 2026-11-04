@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "ObservatorioAltoMinho"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "e04fd9e5-a50e-48d7-bc2d-0a6c9a696eff"
+  }
+}

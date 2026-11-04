@@ -1,7 +1,0 @@
-/* Página inicial: reutiliza os estilos do Retrato */
-@import url("./municipio.css");
-
-/* Faixa "Alto Minho em números" */
-.kpi-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; padding-bottom: 12px; }
-.kpi-strip .mun-card { min-height: 118px; }
-.kpi-strip .mun-card .v b { font-size: 34px; }
