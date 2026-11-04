@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pré-visualização do dashboard Power BI</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#e8ece7;color:#10211d;font-family:"Segoe UI",sans-serif}.canvas{width:1280px;height:720px;margin:auto;background:#f3f4ec;display:grid;grid-template-columns:220px 1fr;overflow:hidden}.side{background:#0f453a;color:white;padding:28px 24px;display:flex;flex-direction:column}.brand{font:700 22px Georgia,serif;line-height:1.15}.brand small{display:block;margin-top:7px;color:#b9d9d1;font:12px "Segoe UI",sans-serif;letter-spacing:.04em}.nav{margin-top:52px}.nav div{padding:13px 0;border-bottom:1px solid #37675e;color:#b9d9d1;font-size:14px}.nav div:first-child{color:white;font-weight:700}.nav b{display:inline-block;width:32px;color:#c8ff5a}.meta{margin-top:auto;font-size:11px;color:#b9d9d1;line-height:1.6}.main{padding:24px 28px;display:grid;grid-template-rows:auto 100px 1fr;gap:18px}.top{display:flex;align-items:flex-start;justify-content:space-between}.eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#0f6554;font-weight:700}.top h1{font:700 33px Georgia,serif;margin:6px 0 0}.filters{display:flex;gap:10px}.filter{background:white;border:1px solid #d8ded9;border-radius:8px;padding:10px 12px;width:176px}.filter span{display:block;color:#70807b;font-size:10px;text-transform:uppercase;letter-spacing:.08em}.filter strong{display:block;margin-top:5px;font-size:14px}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.kpi{background:white;border-radius:10px;padding:15px 16px;border-top:4px solid #0f453a}.kpi:nth-child(2){border-color:#ef735d}.kpi:nth-child(3){border-color:#78b8c9}.kpi:nth-child(4){border-color:#c8ff5a}.kpi small{color:#70807b;font-size:11px}.kpi strong{display:block;font-size:25px;margin:7px 0 2px}.kpi em{font-style:normal;color:#0f6554;font-size:11px}.content{display:grid;grid-template-columns:1.05fr 1.45fr;gap:14px;min-height:0}.panel{background:white;border-radius:10px;padding:16px 18px;overflow:hidden}.panelhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.panel h2{font:700 18px Georgia,serif;margin:0}.panelhead span{color:#70807b;font-size:11px}.mapwrap{height:318px;background:#d9eff5;border-radius:8px;display:flex;align-items:center;justify-content:center}.mapwrap svg{width:86%;height:92%}.municipality{fill:#84b8c5;stroke:white;stroke-width:1.7}.municipality.active{fill:#ef735d}.chart{display:grid;gap:7px}.row{display:grid;grid-template-columns:125px 1fr 58px;align-items:center;gap:9px;font-size:11px}.track{height:14px;background:#edf0ed;border-radius:3px;overflow:hidden}.bar{height:100%;background:#0f453a;border-radius:3px}.row:nth-child(2) .bar,.row:nth-child(7) .bar{background:#78b8c9}.value{text-align:right;font-weight:600}.source{margin-top:11px;padding-top:8px;border-top:1px solid #e3e7e3;color:#70807b;font-size:10px;display:flex;justify-content:space-between}
+  </style>
+</head>
+<body>
+  <main class="canvas">
+    <aside class="side">
+      <div class="brand">Alto Minho<small>Observatório territorial</small></div>
+      <div class="nav"><div><b>01</b>Retrato</div><div><b>02</b>Comparação</div><div><b>03</b>Indicadores</div><div><b>04</b>Metodologia</div></div>
+      <div class="meta">Dados estatísticos<br><strong>INE · Pordata</strong><br>Atualização automática</div>
+    </aside>
+    <section class="main">
+      <header class="top">
+        <div><div class="eyebrow">Dashboard territorial</div><h1>Retrato do Alto Minho</h1></div>
+        <div class="filters"><div class="filter"><span>Território</span><strong>Alto Minho⌄</strong></div><div class="filter"><span>Indicador comparado</span><strong>População residente⌄</strong></div></div>
+      </header>
+      <section class="kpis">
+        <div class="kpi"><small>População residente</small><strong>244 098</strong><em>2025 · pessoas</em></div>
+        <div class="kpi"><small>Densidade populacional</small><strong>110,1</strong><em>2025 · hab./km²</em></div>
+        <div class="kpi"><small>Índice de envelhecimento</small><strong>245,3</strong><em>2025 · índice</em></div>
+        <div class="kpi"><small>Rendimento médio</small><strong>1 340 €</strong><em>2024 · ganho mensal</em></div>
+      </section>
+      <section class="content">
+        <article class="panel"><div class="panelhead"><h2>Mapa municipal</h2><span>Selecione um município</span></div><div class="mapwrap"><svg id="map" viewBox="0 0 520 390" aria-label="Mapa dos municípios"></svg></div><div class="source"><span>Limites administrativos: CAOP · DGT</span><span>10 municípios</span></div></article>
+        <article class="panel"><div class="panelhead"><h2>Comparação municipal</h2><span>População residente · 2025</span></div><div class="chart" id="chart"></div><div class="source"><span>Fonte: Pordata / INE</span><span>Atualização semanal</span></div></article>
+      </section>
+    </section>
+  </main>
+  <script src="../../map-data.js"></script>
+  <script>
+    const svg=document.querySelector('#map');
+    municipalityMapShapes.forEach((m,i)=>{const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',m.path);p.setAttribute('class','municipality'+(i===7?' active':''));const t=document.createElementNS('http://www.w3.org/2000/svg','title');t.textContent=m.name;p.append(t);svg.append(p)});
+    const values=[['Viana do Castelo',92712],['Ponte de Lima',42761],['Arcos de Valdevez',20446],['Monção',18276],['Caminha',17143],['Valença',15705],['Ponte da Barca',11119],['Vila Nova de Cerveira',10077],['Paredes de Coura',8723],['Melgaço',7139]],max=92712;
+    document.querySelector('#chart').innerHTML=values.map(([n,v])=>`<div class="row"><span>${n}</span><div class="track"><div class="bar" style="width:${v/max*100}%"></div></div><span class="value">${v.toLocaleString('pt-PT')}</span></div>`).join('');
+  </script>
+</body>
+</html>

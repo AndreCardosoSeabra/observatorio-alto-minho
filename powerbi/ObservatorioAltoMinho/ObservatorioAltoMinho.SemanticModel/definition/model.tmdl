@@ -1,0 +1,7 @@
+model Model
+	culture: pt-PT
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: pt-PT
+	discourageImplicitMeasures
+
+ref table Indicadores

@@ -1,0 +1,97 @@
+{
+  "name": "AltoMinho-4f9c2a10.json",
+  "dataColors": [
+    "#0F453A",
+    "#EF735D",
+    "#78B8C9",
+    "#C8FF5A",
+    "#739B86",
+    "#E5B956",
+    "#4E7C73",
+    "#A7D3DE"
+  ],
+  "good": "#2C7A5B",
+  "neutral": "#E5B956",
+  "bad": "#C65342",
+  "maximum": "#0F453A",
+  "center": "#E5B956",
+  "minimum": "#D9EFF5",
+  "null": "#EF735D",
+  "foreground": "#10211D",
+  "background": "#F3F4EC",
+  "tableAccent": "#0F453A",
+  "textClasses": {
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 13,
+      "color": "#10211D"
+    },
+    "header": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 11,
+      "color": "#10211D"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 10,
+      "color": "#61716C"
+    },
+    "callout": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 26,
+      "color": "#0F453A"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "title": [
+          {
+            "show": false
+          }
+        ],
+        "visualHeader": [
+          {
+            "show": true
+          }
+        ],
+        "background": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "border": [
+          {
+            "show": false
+          }
+        ]
+      }
+    },
+    "tableEx": {
+      "*": {
+        "columnHeaders": [
+          {
+            "autoSizeColumnWidth": true,
+            "columnAdjustment": "growToFit"
+          }
+        ]
+      }
+    },
+    "pivotTable": {
+      "*": {
+        "columnHeaders": [
+          {
+            "autoSizeColumnWidth": true,
+            "columnAdjustment": "growToFit"
+          }
+        ]
+      }
+    }
+  }
+}
