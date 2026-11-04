@@ -201,7 +201,11 @@ def fetch_ine_via_gateway(url: str, attempts: int = 3) -> object:
             envelope = json.loads(result.stdout.decode("utf-8-sig"))
             provenance_url = envelope.get("result", {}).get("_meta", {}).get("provenance", {}).get("upstream", {}).get("url", "")
             if "www.ine.pt/ine/json_indicador/pindica.jsp" not in provenance_url or f"varcd={code}" not in provenance_url:
-                raise ValueError("O gateway não confirmou a proveniência oficial do INE")
+                raise ValueError(
+                    "O gateway não confirmou a proveniência oficial do INE "
+                    f"(proveniência recebida: {provenance_url!r}; erro: {envelope.get('error')!r}; "
+                    f"resposta: {json.dumps(envelope, ensure_ascii=False)[:300]})"
+                )
             content = envelope["result"]["content"][0]["text"]
             payload = json.loads(content)
             if not isinstance(payload, list) or not payload or payload[0].get("IndicadorCod") != code:
