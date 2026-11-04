@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - versao2
     paths:
       - ".github/workflows/update-data.yml"
       - "scripts/update-data.py"
