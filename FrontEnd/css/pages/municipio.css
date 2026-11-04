@@ -7,7 +7,7 @@
 .sel-stats { display: flex; gap: 12px; }
 .sel-stats div { flex: 1; padding: 14px; border-radius: 14px; background: rgba(255,255,255,.08); }
 .sel-stats small { display: block; font-size: 12px; color: #b7d0c7; }
-.sel-stats strong { display: block; margin-top: 4px; font: 400 28px "DM Serif Display", serif; }
+.sel-stats strong { display: block; margin-top: 4px; font-family: var(--font-title); font-weight: 400; font-size: 28px; }
 .sel-link { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; border-radius: 999px; background: var(--lime); color: var(--forest); font-size: 15px; font-weight: 600; text-decoration: none; }
 .chip-card { flex: 1 1 300px; background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
 .chip-card b { font-size: 14px; font-weight: 600; }
@@ -41,7 +41,7 @@
 .mun-card .l { font-size: 13px; font-weight: 500; color: var(--muted); }
 .mun-card .y { padding: 3px 10px; border-radius: 999px; background: #eef2ec; font-size: 12px; color: #4f5b57; }
 .mun-card .v { display: flex; align-items: baseline; gap: 8px; }
-.mun-card .v b { font: 400 44px/1.05 "DM Serif Display", serif; letter-spacing: -.02em; color: var(--forest); }
+.mun-card .v b { font-family: var(--font-title); font-weight: 400; font-size: 44px; line-height: 1.05; letter-spacing: -.02em; color: var(--forest); }
 .mun-card .v small { font-size: 13px; color: var(--muted); }
 .mun-card .c { margin-top: auto; font-size: 13px; font-weight: 500; color: var(--forest-2); }
 .mun-note { margin: 0; font-size: 12px; color: #b7d0c7; }

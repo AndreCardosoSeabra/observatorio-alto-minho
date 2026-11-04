@@ -674,7 +674,7 @@ renderCategoryButtons(); renderCatalog(); setTerritory(selectedTerritory);
 // Rodapé partilhado: logo, email e redes sociais (injetado em todas as páginas).
 (function renderFooter() {
   if (document.querySelector(".site-footer")) return;
-  const logo = new URL("../imgs/cim-alto-minho.svg", document.currentScript.src).href;
+  const logo = new URL("../../imgs/cim-alto-minho.svg", document.currentScript.src).href;
   const email = "example@gmail.com";
   const socials = [
     ["Facebook", "#", "M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.3H8v3h2.5V21z"],
@@ -682,7 +682,7 @@ renderCategoryButtons(); renderCatalog(); setTerritory(selectedTerritory);
     ["LinkedIn", "#", "M5 9h3v10H5zm1.5-4.5a1.7 1.7 0 1 1 0 3.4 1.7 1.7 0 0 1 0-3.4zM10 9h2.9v1.4c.5-.9 1.6-1.6 3.1-1.6 3 0 3.5 2 3.5 4.5V19h-3v-5c0-1.2 0-2.6-1.6-2.6S13 12.7 13 14v5h-3z"]
   ];
   const icons = socials.map(([n, u, d]) =>
-    `<a href="${u}" aria-label="${n}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg></a>`).join("");
+    `<a href="${u}" aria-label="${n}"${u === "#" ? " onclick=\"return false\"" : " target=\"_blank\" rel=\"noopener\""}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg></a>`).join("");
   const el = document.createElement("footer");
   el.className = "site-footer";
   el.innerHTML = `
