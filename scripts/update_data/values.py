@@ -58,5 +58,7 @@ def merge_history(entry: dict, new_series: dict[str, dict]) -> int:
     os anos que a fonte deixou de devolver são mantidos. Só ficam os HISTORY_YEARS anos mais recentes.
     Devolve o número de anos no histórico."""
     merged = {**(entry.get("history") or {}), **new_series}
+    # Anos em que todos os valores são 0 são lacunas da fonte, não dados reais.
+    merged = {y: r for y, r in merged.items() if not (r and all(v == 0 for v in r.values() if v is not None) and any(v is not None for v in r.values()))}
     entry["history"] = {year: merged[year] for year in sorted(merged)[-HISTORY_YEARS:]}
     return len(entry["history"])

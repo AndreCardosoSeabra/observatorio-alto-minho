@@ -1,0 +1,8 @@
+# Guardar como Backend/php/.htaccess
+Options -Indexes
+<FilesMatch "^(config|auth)\.php$">
+  Require all denied
+</FilesMatch>
+<FilesMatch "\.(json|log|bak)$">
+  Require all denied
+</FilesMatch>

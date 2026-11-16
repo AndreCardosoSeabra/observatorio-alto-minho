@@ -33,13 +33,47 @@
   const seriesOf = (item) => ({ ...item.history, [item.year]: item.values });
   const yearsOf = (s) =>
     Object.keys(s)
-      .filter((y) => munis.some((n) => s[y]?.[n] != null))
+      .filter((y) => munis.some((n) => s[y]?.[n] != null && s[y][n] !== 0))
       .sort((a, b) => a - b);
   const avgOf = (s, y) => {
     const v = s[y]?.[AVG];
     if (v != null) return v;
     const a = munis.map((n) => s[y]?.[n]).filter((x) => x != null);
     return a.length ? a.reduce((p, c) => p + c, 0) / a.length : null;
+  };
+  // Referência escolhida em "Comparar com": Alto Minho, Norte ou Portugal.
+  const REFS = { "alto-minho": null, norte: "Norte", portugal: "Portugal" };
+  const refInputs = [...document.querySelectorAll('input[name="cmp-ref"]')];
+  const refKey = () => refInputs.find((i) => i.checked)?.value || "alto-minho";
+  const refTerritory = () => REFS[refKey()];
+  const refLabel = () => (refTerritory() ? refTerritory() : "Alto Minho");
+  const refOf = (item, s, y) =>
+    refTerritory()
+      ? (item.reference?.[refTerritory()]?.[y] ?? null)
+      : avgOf(s, y);
+  // "abaixo da média" / "abaixo do valor de Portugal"
+  const vs = (v, a) => {
+    const t = refTerritory();
+    const of = t ? `o valor ${t === "Norte" ? "do" : "de"} ${t}` : "a média";
+    if (v === a) return `em linha com ${of}`;
+    return `${v < a ? "abaixo" : "acima"} ${t ? "d" + of.slice(0) : "do valor do Alto Minho"}`;
+  };
+  // Só permite Norte/Portugal quando o indicador tem esses dados.
+  let wantedRef = "alto-minho";
+  const syncRefs = (item) => {
+    refInputs.forEach((i) => {
+      const t = REFS[i.value];
+      const ok = !t || !!item.reference?.[t];
+      i.disabled = !ok;
+      i.closest("label").classList.toggle("is-disabled", !ok);
+    });
+    // Repõe a escolha do utilizador quando o indicador a suporta; senão usa Alto Minho só temporariamente.
+    const want = refInputs.find((i) => i.value === wantedRef);
+    const pick =
+      want && !want.disabled
+        ? want
+        : refInputs.find((i) => i.value === "alto-minho");
+    pick.checked = true;
   };
   const num = (item, v) =>
     v == null ? WARN : `${item.prefix || ""}${format(v)}`;
@@ -48,87 +82,29 @@
     /^.[A-ZÁÉÍÓÚÂÊÔÃÕÇ]/.test(t) ? t : t.charAt(0).toLowerCase() + t.slice(1);
   const dest = () =>
     munis.includes(selectedTerritory) ? selectedTerritory : null;
-  // Indicador 2: copia as opções do seletor principal e acrescenta "Nenhum".
-  const ind2Sel = $("cmp-ind2");
-  ind2Sel.innerHTML =
-    `<option value="">Nenhum</option>` + compareSelect.innerHTML;
-  ind2Sel.value = "";
-  const pearson = (s1, s2, y) => {
-    const p = munis
-      .map((n) => [s1[y]?.[n], s2[y]?.[n]])
-      .filter((r) => r[0] != null && r[1] != null);
-    if (p.length < 4) return null;
-    const mx = p.reduce((a, r) => a + r[0], 0) / p.length,
-      my = p.reduce((a, r) => a + r[1], 0) / p.length;
-    let sxy = 0,
-      sxx = 0,
-      syy = 0;
-    p.forEach(([a, b]) => {
-      sxy += (a - mx) * (b - my);
-      sxx += (a - mx) ** 2;
-      syy += (b - my) ** 2;
-    });
-    return sxx && syy ? sxy / Math.sqrt(sxx * syy) : null;
-  };
-
   // ----- 1. resumo + KPIs -----
   function renderTop(c) {
-    const { item, s, year, d, item2, s2 } = c;
-    $("cmp-summary").classList.toggle("has-2", !!item2);
+    const { item, s, year, d } = c;
     $("cmp-summary").innerHTML =
       `<div>${icons.chart}<span><small>Indicador</small><b>${item.name}</b></span></div>` +
-      (item2
-        ? `<div>${icons.chart}<span><small>Indicador 2</small><b>${item2.name}</b></span></div>`
-        : "") +
       `<div>${icons.pin}<span><small>Município em destaque</small><b>${d || "Nenhum selecionado"}</b></span></div>`;
 
     const big = (it, v) =>
       `<span class="v">${num(it, v)}<span>${unitOf(it)}</span></span>`;
-    const avg = year ? avgOf(s, year) : null;
+    const avg = year ? refOf(item, s, year) : null;
     const dv = d && year ? s[year]?.[d] : null;
-    const rel = (v, a) =>
-      v == null || a == null
-        ? null
-        : v < a
-          ? "abaixo"
-          : v > a
-            ? "acima"
-            : "em linha";
-
-    if (item2) {
-      const avg2 = year ? avgOf(s2, year) : null,
-        dv2 = d && year ? s2[year]?.[d] : null;
-      let msg = "Escolha um município no menu lateral para o destacar.";
-      if (d) {
-        const r1 = rel(dv, avg),
-          r2 = rel(dv2, avg2);
-        msg =
-          r1 && r2
-            ? `${d}: ${r1} da média em ${item.name} e ${r2} da média em ${item2.name}.`
-            : `Sem dados de ${d} para um dos indicadores neste ano.`;
-      }
-      $("cmp-kpis").innerHTML =
-        `<div class="cmp-kpi main">${icons.people}<span><small>${item.name}<strong>${d || "Município em destaque"}</strong></small>${big(item, dv)}</span></div>` +
-        `<div class="cmp-kpi second">${icons.people}<span><small>${item2.name}<strong>${d || "Município em destaque"}</strong></small>${big(item2, dv2)}</span></div>` +
-        `<div class="cmp-kpi">${icons.layers}<span><small>Média do Alto Minho<strong>${item.name}</strong></small>${big(item, avg)}</span></div>` +
-        `<div class="cmp-kpi">${icons.layers}<span><small>Média do Alto Minho<strong>${item2.name}</strong></small>${big(item2, avg2)}</span></div>` +
-        `<div class="cmp-kpi note">${icons.info}<span>${msg}</span></div>`;
-      return;
-    }
-
     const vals = year
       ? munis.map((n) => [n, s[year]?.[n]]).filter((r) => r[1] != null)
       : [];
     const hi = vals.reduce((m, r) => (m == null || r[1] > m[1] ? r : m), null);
     const lo = vals.reduce((m, r) => (m == null || r[1] < m[1] ? r : m), null);
     let msg = "Escolha um município no menu lateral para o destacar.";
-    if (d && dv != null && avg != null)
-      msg = `${d} ${dv < avg ? "abaixo da" : dv > avg ? "acima da" : "em linha com a"} média sub-regional.`;
+    if (d && dv != null && avg != null) msg = `${d} ${vs(dv, avg)}.`;
     else if (d) msg = `Sem dados de ${d} para este ano.`;
 
     $("cmp-kpis").innerHTML =
       `<div class="cmp-kpi main">${icons.people}<span><small>${d || "Município em destaque"}</small>${big(item, dv)}</span></div>` +
-      `<div class="cmp-kpi">${icons.layers}<span><small>Média do Alto Minho</small>${big(item, avg)}</span></div>` +
+      `<div class="cmp-kpi">${icons.layers}<span><small>${refLabel()}</small>${big(item, avg)}</span></div>` +
       `<div class="cmp-kpi up">${icons.up}<span><small>Valor mais alto<strong>${hi ? hi[0] : WARN}</strong></small>${big(item, hi?.[1])}</span></div>` +
       `<div class="cmp-kpi down">${icons.down}<span><small>Valor mais baixo<strong>${lo ? lo[0] : WARN}</strong></small>${big(item, lo?.[1])}</span></div>` +
       `<div class="cmp-kpi note">${icons.info}<span>${msg}</span></div>`;
@@ -136,16 +112,15 @@
 
   // ----- 2. barras -----
   function renderBars(c) {
-    const { item, s, year, d, item2, s2 } = c;
+    const { item, s, year, d } = c;
     const box = $("cmp-bars");
-    $("cmp-bars-title").textContent = item2
-      ? `${item.name} e ${item2.name} por município${year ? ` (${year})` : ""}`
-      : `Municípios do Alto Minho por ${lower(item.name)}${year ? ` (${year})` : ""}`;
+    $("cmp-bars-title").textContent =
+      `Municípios do Alto Minho por ${lower(item.name)}${year ? ` (${year})` : ""}`;
     if (!year) {
-      box.innerHTML = `<p class="cmp-empty">Sem dados municipais ${item2 ? "comuns aos dois indicadores" : "para este indicador"}.</p>`;
+      box.innerHTML = `<p class="cmp-empty">Sem dados municipais para este indicador.</p>`;
       return;
     }
-    const rows = munis.map((n) => [n, s[year]?.[n], s2 ? s2[year]?.[n] : null]);
+    const rows = munis.map((n) => [n, s[year]?.[n]]);
     const order = orderSel.value;
     rows.sort(
       order === "asc"
@@ -154,69 +129,42 @@
           ? (a, b) => a[0].localeCompare(b[0], "pt")
           : (a, b) => (b[1] ?? -Infinity) - (a[1] ?? -Infinity),
     );
-    const mx = (i) => Math.max(...rows.map((r) => Math.abs(r[i] ?? 0))) || 1;
-    const max = mx(1),
-      max2 = item2 ? mx(2) : 1;
+    const max = Math.max(...rows.map((r) => Math.abs(r[1] ?? 0))) || 1;
     const w = (v, m) =>
       v == null ? 0 : Math.max(1.5, (Math.abs(v) / m) * 100);
     box.setAttribute("role", "img");
-    box.setAttribute(
-      "aria-label",
-      `${item.name}${item2 ? ` e ${item2.name}` : ""}, ${year}, por município`,
-    );
+    box.setAttribute("aria-label", `${item.name}, ${year}, por município`);
 
-    if (!item2) {
-      box.innerHTML = rows
-        .map(
-          ([n, v]) =>
-            `<div class="cmp-bar${n === d ? " dest" : ""}"><span class="cmp-bar-label" title="${n}">${n}</span>` +
-            `<span class="cmp-bar-track"><span class="cmp-bar-fill${v < 0 ? " neg" : ""}" style="--w:${w(v, max)}%;display:block"></span></span>` +
-            `<span class="cmp-bar-value">${v == null ? WARN : formattedValue(item, v)}</span></div>`,
-        )
-        .join("");
-      return;
-    }
-    const key =
-      `<div class="cmp-bars-key"><span><i style="--k:var(--cmp-accent)"></i>${item.name}</span>` +
-      `<span><i style="--k:var(--cmp-accent2)"></i>${item2.name}</span></div>`;
-    box.innerHTML =
-      key +
-      rows
-        .map(
-          ([n, v, v2]) =>
-            `<div class="cmp-bar two${n === d ? " dest" : ""}"><span class="cmp-bar-label" title="${n}">${n}</span>` +
-            `<span class="cmp-bar-tracks">` +
-            `<span class="cmp-bar-track"><span class="cmp-bar-fill f1" style="--w:${w(v, max)}%;display:block"></span></span>` +
-            `<span class="cmp-bar-track"><span class="cmp-bar-fill f2" style="--w:${w(v2, max2)}%;display:block"></span></span></span>` +
-            `<span class="cmp-bar-values"><span>${v == null ? WARN : formattedValue(item, v)}</span><span>${v2 == null ? WARN : formattedValue(item2, v2)}</span></span></div>`,
-        )
-        .join("");
+    box.innerHTML = rows
+      .map(
+        ([n, v]) =>
+          `<div class="cmp-bar${n === d ? " dest" : ""}"><span class="cmp-bar-label" title="${n}">${n}</span>` +
+          `<span class="cmp-bar-track"><span class="cmp-bar-fill${v < 0 ? " neg" : ""}" style="--w:${w(v, max)}%;display:block"></span></span>` +
+          `<span class="cmp-bar-value">${v == null ? WARN : formattedValue(item, v)}</span></div>`,
+      )
+      .join("");
   }
 
   // ----- 3. evolução -----
-  // Com dois indicadores usa dois eixos (esquerda: indicador 1; direita: indicador 2).
   function renderLine(c) {
-    const { item, s, years, d, item2, s2 } = c;
+    const { item, s, years, d } = c;
     const box = $("cmp-line");
-    $("cmp-line-title").textContent = item2
-      ? `Evolução: ${item.name} e ${item2.name}${years.length ? ` (${years[0]} – ${years[years.length - 1]})` : ""}`
-      : `Evolução ${lower(item.name)}${years.length ? ` (${years[0]} – ${years[years.length - 1]})` : ""}`;
+    $("cmp-line-title").textContent =
+      `Evolução ${lower(item.name)}${years.length ? ` (${years[0]} – ${years[years.length - 1]})` : ""}`;
     if (years.length < 2) {
-      box.innerHTML = `<p class="cmp-empty">${item2 ? "Os dois indicadores não têm pelo menos dois anos em comum" : "Este indicador só tem dados de um ano"}${years[0] ? ` (${years[0]})` : ""}, por isso não há evolução para mostrar.</p>`;
+      box.innerHTML = `<p class="cmp-empty">Este indicador só tem dados de um ano${years[0] ? ` (${years[0]})` : ""}, por isso não há evolução para mostrar.</p>`;
       return;
     }
     const W = 900,
       H = 290,
       L = 52,
-      R = item2 ? 58 : 22,
+      R = 22,
       T = 26,
       B = 34;
     const on = (k) => !hidden.has(k);
     const showDest = d && on("dest"),
       showAvg = on("avg"),
       showOthers = on("others");
-    const showDest2 = item2 && d && on("dest2"),
-      showAvg2 = item2 && on("avg2");
     const others = munis.filter((n) => n !== d);
 
     // escala (mín., máx., passo) para um conjunto de valores
@@ -234,17 +182,13 @@
         y: (v) => T + ((max - v) * (H - T - B)) / (max - min || 1),
       };
     };
-    const pool1 = [],
-      pool2 = [];
+    const pool1 = [];
     years.forEach((yr) => {
       if (showDest) pool1.push(s[yr]?.[d]);
-      if (showAvg) pool1.push(avgOf(s, yr));
+      if (showAvg) pool1.push(refOf(item, s, yr));
       if (showOthers) others.forEach((n) => pool1.push(s[yr]?.[n]));
-      if (showDest2) pool2.push(s2[yr]?.[d]);
-      if (showAvg2) pool2.push(avgOf(s2, yr));
     });
-    const sc1 = scaleOf(pool1),
-      sc2 = item2 ? scaleOf(pool2) : null;
+    const sc1 = scaleOf(pool1);
     const x = (yr) =>
       L + (years.indexOf(yr) * (W - L - R)) / (years.length - 1);
 
@@ -253,11 +197,6 @@
       const vv = Number(v.toFixed(6));
       grid += `<line class="${vv === 0 ? "zero" : "grid"}" x1="${L}" x2="${W - R}" y1="${sc1.y(vv)}" y2="${sc1.y(vv)}"/><text class="axis" x="${L - 8}" y="${sc1.y(vv) + 4}" text-anchor="end">${format(vv)}</text>`;
     }
-    if (sc2)
-      for (let v = sc2.min; v <= sc2.max + sc2.step / 2; v += sc2.step) {
-        const vv = Number(v.toFixed(6));
-        grid += `<text class="axis" x="${W - R + 8}" y="${sc2.y(vv) + 4}" text-anchor="start" fill="var(--cmp-accent2)">${format(vv)}</text>`;
-      }
     const every = Math.max(1, Math.ceil(years.length / 17));
     const xl = years
       .map((yr, i) =>
@@ -296,19 +235,15 @@
       });
       return out;
     };
-    const ACC = "var(--cmp-accent)",
-      ACC2 = "var(--cmp-accent2)";
+    const ACC = "var(--cmp-accent)";
     let svgLines = "";
     if (showOthers)
       others.forEach((n) => {
         svgLines += `<path d="${path((yr) => s[yr]?.[n], sc1.y)}" fill="none" stroke="var(--cmp-line-other)" stroke-width="1.6" stroke-linejoin="round"/>`;
       });
     if (showAvg)
-      svgLines += `<path d="${path((yr) => avgOf(s, yr), sc1.y)}" fill="none" stroke="${item2 ? ACC : "var(--forest)"}" stroke-width="2" stroke-dasharray="6 5" opacity="${item2 ? 0.7 : 1}"/>`;
-    if (showAvg2)
-      svgLines += `<path d="${path((yr) => avgOf(s2, yr), sc2.y)}" fill="none" stroke="${ACC2}" stroke-width="2" stroke-dasharray="6 5" opacity="0.7"/>`;
+      svgLines += `<path d="${path((yr) => refOf(item, s, yr), sc1.y)}" fill="none" stroke="var(--forest)" stroke-width="2" stroke-dasharray="6 5"/>`;
     if (showDest) svgLines += thick((yr) => s[yr]?.[d], sc1.y, ACC);
-    if (showDest2) svgLines += thick((yr) => s2[yr]?.[d], sc2.y, ACC2);
     const bw = (W - L - R) / (years.length - 1);
     const bands = years
       .map(
@@ -321,34 +256,16 @@
       `<svg viewBox="0 0 34 10" aria-hidden="true"><line x1="1" x2="33" y1="5" y2="5" stroke="${extra}" stroke-width="3" ${dash ? 'stroke-dasharray="6 4"' : ""} stroke-linecap="round"/></svg>`;
     const btn = (k, label, svg, off) =>
       `<button type="button" data-k="${k}" class="${hidden.has(k) ? "off" : ""}" aria-pressed="${!hidden.has(k)}"${off ? " disabled" : ""}>${svg}${label}</button>`;
-    const tag = (a, it) => (item2 ? `${a} · ${it.name}` : a);
     const legend =
       `<div class="cmp-legend">` +
-      btn("dest", tag(d || "Município em destaque", item), sw(ACC), !d) +
-      (item2
-        ? btn("dest2", tag(d || "Município em destaque", item2), sw(ACC2), !d)
-        : "") +
-      btn(
-        "avg",
-        tag("Média do Alto Minho", item),
-        sw(item2 ? ACC : "var(--forest)", true),
-      ) +
-      (item2
-        ? btn("avg2", tag("Média do Alto Minho", item2), sw(ACC2, true))
-        : "") +
-      btn(
-        "others",
-        item2 ? `Outros municípios · ${item.name}` : "Outros municípios",
-        sw("var(--cmp-line-other)"),
-      ) +
+      btn("dest", d || "Município em destaque", sw(ACC), !d) +
+      btn("avg", refLabel(), sw("var(--forest)", true)) +
+      btn("others", "Outros municípios", sw("var(--cmp-line-other)")) +
       `<span class="hint">Clique na legenda para ocultar/mostrar linhas.</span></div>`;
 
     box.innerHTML =
-      `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Evolução de ${item.name}${item2 ? ` e ${item2.name}` : ""}, ${years[0]} a ${years[years.length - 1]}">` +
+      `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Evolução de ${item.name}, ${years[0]} a ${years[years.length - 1]}">` +
       `<text class="unit" x="4" y="${T - 10}">${unitOf(item) || ""}</text>` +
-      (item2
-        ? `<text class="unit" x="${W - 4}" y="${T - 10}" text-anchor="end" fill="var(--cmp-accent2)">${unitOf(item2) || ""}</text>`
-        : "") +
       `${grid}${xl}${svgLines}<line class="hover-line" y1="${T}" y2="${H - B}" hidden/>${bands}</svg><div class="line-tip" hidden></div>${legend}`;
 
     // Legenda clicável
@@ -384,12 +301,8 @@
         : [];
       tip.innerHTML =
         `<strong>${yr}</strong>` +
-        (d ? row(tag(d, item), item, s[yr]?.[d], "sel") : "") +
-        (item2 && d ? row(tag(d, item2), item2, s2[yr]?.[d], "sel") : "") +
-        row(tag("Média do Alto Minho", item), item, avgOf(s, yr), "sel") +
-        (item2
-          ? row(tag("Média do Alto Minho", item2), item2, avgOf(s2, yr), "sel")
-          : "") +
+        (d ? row(d, item, s[yr]?.[d], "sel") : "") +
+        row(refLabel(), item, refOf(item, s, yr), "sel") +
         rest.map(([n, v]) => row(n, item, v)).join("");
       vline.setAttribute("x1", x(yr));
       vline.setAttribute("x2", x(yr));
@@ -409,21 +322,21 @@
 
   // ----- 4. leitura rápida -----
   function renderReading(c) {
-    const { item, s, years, year, d, item2, s2 } = c;
+    const { item, s, years, year, d } = c;
     const ul = $("cmp-reading"),
       li = [];
     if (!year) {
-      ul.innerHTML = `<li>Sem dados municipais ${item2 ? "comuns aos dois indicadores" : "para este indicador"}.</li>`;
+      ul.innerHTML = `<li>Sem dados municipais para este indicador.</li>`;
       return;
     }
 
     // Factos de um indicador para o município em destaque.
     const facts = (it, ss, pre) => {
-      const avg = avgOf(ss, year),
+      const avg = refOf(it, ss, year),
         dv = d ? ss[year]?.[d] : null;
       if (!d) {
         li.push(
-          `${pre}Média do Alto Minho: <strong>${formattedValue(it, avg)}</strong> em ${year}.`,
+          `${pre}${refLabel()}: <strong>${formattedValue(it, avg)}</strong> em ${year}.`,
         );
         return;
       }
@@ -433,7 +346,7 @@
       }
       let t = `${pre}${d} apresenta <strong>${formattedValue(it, dv)}</strong> em ${year}`;
       if (avg != null)
-        t += `, <strong>${dv < avg ? "abaixo da" : dv > avg ? "acima da" : "em linha com a"} média</strong>${dv === avg ? "" : ` (${formattedValue(it, avg)})`}`;
+        t += `, <strong>${vs(dv, avg)}</strong>${dv === avg ? "" : ` (${formattedValue(it, avg)})`}`;
       const rank =
         munis
           .map((n) => ss[year]?.[n])
@@ -461,32 +374,12 @@
       );
     };
 
-    if (!d) {
-      facts(item, s, item2 ? `<em>${item.name}</em>: ` : "");
-      if (item2) facts(item2, s2, `<em>${item2.name}</em>: `);
+    facts(item, s, "");
+    if (!d)
       li.push(
         "Escolha um município no menu lateral para o destacar e ver a leitura.",
       );
-    } else {
-      facts(item, s, item2 ? `<em>${item.name}</em>: ` : "");
-      if (item2) facts(item2, s2, `<em>${item2.name}</em>: `);
-      trend(item, s, item2 ? `<em>${item.name}</em>: ` : "");
-      if (item2) trend(item2, s2, `<em>${item2.name}</em>: `);
-    }
-    if (item2) {
-      const r = pearson(s, s2, year);
-      if (r != null) {
-        const f =
-          Math.abs(r) >= 0.7
-            ? "forte"
-            : Math.abs(r) >= 0.4
-              ? "moderada"
-              : "fraca";
-        li.push(
-          `Entre municípios, a relação é <strong>${f} e ${r >= 0 ? "positiva" : "negativa"}</strong> (r = ${r.toFixed(2).replace(".", ",")}): ${r >= 0 ? "valores altos de um tendem a vir com valores altos do outro" : "valores altos de um tendem a vir com valores baixos do outro"}.`,
-        );
-      }
-    }
+    else trend(item, s, "");
     ul.innerHTML = li.map((t) => `<li>${t}</li>`).join("");
   }
 
@@ -495,15 +388,10 @@
   function draw() {
     const item =
       catalog.find((e) => e.key === compareSelect.value) || catalog[0];
-    const item2 =
-      ind2Sel.value && ind2Sel.value !== item.key
-        ? catalog.find((e) => e.key === ind2Sel.value)
-        : null;
-    const s = seriesOf(item),
-      s2 = item2 ? seriesOf(item2) : null;
-    const y1 = yearsOf(s),
-      years = item2 ? y1.filter((y) => yearsOf(s2).includes(y)) : y1;
-    const key = item.key + "|" + (item2 ? item2.key : "");
+    syncRefs(item);
+    const s = seriesOf(item);
+    const years = yearsOf(s);
+    const key = item.key;
     if (lastKey !== key || !years.includes(yearSel.value)) {
       lastKey = key;
       yearSel.innerHTML = years
@@ -517,8 +405,6 @@
     const c = {
       item,
       s,
-      item2,
-      s2,
       years,
       year: yearSel.value || null,
       d: dest(),
@@ -530,8 +416,13 @@
   }
 
   compareSelect.addEventListener("change", draw);
-  ind2Sel.addEventListener("change", draw);
   yearSel.addEventListener("change", draw);
+  refInputs.forEach((i) =>
+    i.addEventListener("change", () => {
+      wantedRef = i.value;
+      draw();
+    }),
+  );
   orderSel.addEventListener("change", draw);
   onTerritoryChange(draw);
   draw();

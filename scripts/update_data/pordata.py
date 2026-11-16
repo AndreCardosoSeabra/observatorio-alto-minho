@@ -100,6 +100,34 @@ def pordata_history(path: Path, selected_columns: tuple[int, ...], newest_year: 
     return dict(sorted(history.items())), sorted(skipped)
 
 
+REFERENCE_NAMES = {"norte": "Norte", "portugal": "Portugal"}
+
+
+def reference_history(path: Path, selected_columns: tuple[int, ...], newest_year: int) -> dict[str, dict]:
+    """Lê do mesmo Excel as linhas Norte e Portugal, com as mesmas colunas escolhidas para os municípios.
+    Devolve {"Norte": {ano: valor}, "Portugal": {ano: valor}}; só inclui o que existir no ficheiro."""
+    rows, _, year_by_column = read_pordata_layout(path)
+    reference_rows: dict[str, int] = {}
+    for row_index, row in enumerate(rows):
+        if len(row) > 1 and (name := REFERENCE_NAMES.get(normalized(row[1]))):
+            reference_rows.setdefault(name, row_index)
+    groups = group_columns_by_year(year_by_column)
+    newest_group = groups[newest_year]
+    positions = [newest_group.index(column) for column in selected_columns]
+    result: dict[str, dict] = {name: {} for name in reference_rows}
+    for year, columns in groups.items():
+        if len(columns) != len(newest_group):
+            continue
+        picked = [columns[position] for position in positions]
+        for name, row_index in reference_rows.items():
+            parts = [as_number(rows[row_index][c]) if c < len(rows[row_index]) else None for c in picked]
+            if any(part is None for part in parts):
+                continue
+            total = round(sum(float(part) for part in parts), 6)
+            result[name][str(year)] = int(total) if total.is_integer() else total
+    return {name: dict(sorted(series.items())) for name, series in result.items() if series}
+
+
 def candidate_score(candidate: dict[str, float | int], current: dict[str, float | int]) -> float:
     """Mede o quão parecida é uma coluna candidata com os valores atuais: mediana do erro relativo entre
     os 11 territórios. Quanto mais perto de 0, mais provável ser a mesma série."""
@@ -192,6 +220,12 @@ def update_pordata(values_by_name: dict, report: list[dict]) -> int:
             history, skipped = pordata_history(path, columns, int(year))
             history[year] = selected
             years_stored = merge_history(current, history)
+            try:
+                reference = reference_history(path, columns, int(year))
+                if reference:
+                    current["reference"] = reference
+            except Exception:
+                pass  # Norte/Portugal são opcionais: se faltarem, o indicador mantém o que tinha
             updated += 1
             entry_report = {"indicator": name, "source": "Pordata", "status": "updated" if changed else "checked", "year": year, "match_error": round(score, 4), "columns": columns, "years_in_history": years_stored, "years_skipped": skipped}
             if years_stored <= 2:

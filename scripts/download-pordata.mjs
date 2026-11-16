@@ -3,8 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
 
 const sources = JSON.parse(await readFile("data/pordata-sources.json", "utf8"));
-const auxiliaryUrls = ["https://www.pordata.pt/portugal/evolucao+do+salario+minimo+nacional-74"];
-const allUrls = [...new Set([...Object.values(sources), ...auxiliaryUrls])];
+const allUrls = [...new Set(Object.values(sources))];
 const urls = process.env.PORDATA_ONLY_ID
   ? allUrls.filter((url) => url.endsWith(`-${process.env.PORDATA_ONLY_ID}`))
   : allUrls;
@@ -17,13 +16,16 @@ const TERRITORIES = [
   "Alto Minho", "Arcos de Valdevez", "Caminha", "Melgaço", "Monção", "Paredes de Coura",
   "Ponte da Barca", "Ponte de Lima", "Valença", "Viana do Castelo", "Vila Nova de Cerveira",
 ];
+// Territórios de referência descarregados também: Norte e Portugal.
+const REFERENCE_TERRITORIES = ["Norte", "Portugal"];
+const SELECTED = [...TERRITORIES, ...REFERENCE_TERRITORIES];
 
 async function rejectCookies(page) {
   await page.getByRole("button", { name: /rejeitar/i }).first().click({ timeout: 8_000 }).catch(() => {});
   await page.waitForTimeout(500);
 }
 
-// Na página "tabela completa" (ambiente de consulta): todos os anos + só Alto Minho e os 10 municípios.
+// Na página "tabela completa" (ambiente de consulta): todos os anos + Alto Minho, os 10 municípios, Norte e Portugal.
 // Usa cliques reais (como um utilizador), um de cada vez, a esperar pelo servidor entre passos.
 async function settle(page) {
   await page.waitForLoadState("networkidle", { timeout: 60_000 }).catch(() => {});
@@ -42,7 +44,7 @@ async function configureQuery(page, id) {
     await page.locator('img[title="Desseleccionar Todos"]').first().click();
   });
   await page.waitForTimeout(800);
-  for (const name of TERRITORIES) {
+  for (const name of SELECTED) {
     await block.locator(`td[geotextcontent="${name}"] input[type="checkbox"]`).first().check({ timeout: 10_000 });
   }
   // Anos: abrir o painel se estiver fechado e clicar em "Seleccionar Todos"
@@ -58,13 +60,13 @@ async function configureQuery(page, id) {
   console.log(`  ${id}: territórios ${count}, anos ${years}`);
   const [yearsSelected, yearsTotal] = years.replace(/[()]/g, "").split("/");
   if (yearsSelected !== yearsTotal) throw new Error(`${id}: nem todos os anos selecionados ${years}`);
-  if (!count.startsWith(`(${TERRITORIES.length}/`)) throw new Error(`${id}: seleção de territórios incorreta ${count}`);
+  if (!count.startsWith(`(${SELECTED.length}/`)) throw new Error(`${id}: seleção de territórios incorreta ${count}`);
 
-  // Actualizar (clique real) e esperar que Portugal/Continente desapareçam da tabela
+  // Actualizar (clique real) e esperar que a linha Continente (não selecionada) desapareça da tabela
   await page.locator("input.Menu_Workspace_UpdateButton").click();
   await settle(page);
   await page.waitForFunction(
-    () => ![...document.querySelectorAll("td.ano")].some((td) => /^\s*(Portugal|Continente)\s*$/.test(td.textContent.replace(/\u00a0/g, " "))),
+    () => ![...document.querySelectorAll("td.ano")].some((td) => /^\s*Continente\s*$/.test(td.textContent.replace(/\u00a0/g, " "))),
     null, { timeout: 90_000 },
   );
 }
